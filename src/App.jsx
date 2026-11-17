@@ -91,9 +91,12 @@ function Shell() {
   );
 }
 
+// Served from Vite's base URL ("/" on a custom domain, "/pwa/" as a GitHub Pages project site).
+const BASENAME = import.meta.env.BASE_URL.replace(/\/$/, "") || "/";
+
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={BASENAME}>
       <Shell />
     </BrowserRouter>
   );

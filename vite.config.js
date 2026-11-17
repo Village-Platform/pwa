@@ -2,34 +2,39 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
+// "/" by default. The GitHub Pages workflow builds with BASE_PATH=/pwa/ (project site); a custom
+// domain would set it back to "/".
+const base = process.env.BASE_PATH || "/";
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["fonts/*.ttf", "brand/*", "icons/apple-touch-icon.png", "icons/favicon-32.png"],
       manifest: {
-        id: "/",
+        id: base,
         name: "أجهور الكبرى",
         short_name: "أجهور",
         description: "كل خدمات قريتك في مكان واحد",
         lang: "ar",
         dir: "rtl",
-        start_url: "/",
-        scope: "/",
+        start_url: base,
+        scope: base,
         display: "standalone",
         orientation: "portrait",
         background_color: "#FFFFFF",
         theme_color: "#0B3727",
         icons: [
-          { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-          { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-          { src: "/icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          { src: `${base}icons/icon-192.png`, sizes: "192x192", type: "image/png" },
+          { src: `${base}icons/icon-512.png`, sizes: "512x512", type: "image/png" },
+          { src: `${base}icons/maskable-512.png`, sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
       },
       workbox: {
         // App shell: every navigation gets index.html from the cache, so the app opens offline.
-        navigateFallback: "/index.html",
+        navigateFallback: `${base}index.html`,
         globPatterns: ["**/*.{js,css,html,png,jpg,svg,ttf}"],
         runtimeCaching: [
           {

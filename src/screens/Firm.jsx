@@ -8,6 +8,7 @@ import { S } from "../lib/strings.js";
 import Icon from "../components/Icon.jsx";
 import { toast } from "../components/Toast.jsx";
 import { Badge, DangerButton, Dialog, ErrorBanner, GhostButton, ScreenTitle, SkeletonRows } from "../components/ui.jsx";
+import { asset } from "../lib/asset.js";
 
 /**
  * Which controls to show. The server sends them in `can` (its FirmPolicy); without it, the same
@@ -55,7 +56,7 @@ export default function Firm() {
     <div className="pb-10">
       {/* Photo header with the back / share buttons on top (Android SheetLayout). */}
       <div className="relative h-[190px]">
-        <img src="/brand/brand_scene.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={asset("brand/brand_scene.jpg")} alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/30" />
         <div className="relative flex justify-between p-3 pt-safe">
           <Overlay onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} label={S.back} icon="back" />

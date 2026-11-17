@@ -40,6 +40,20 @@ npx vite preview --outDir /tmp/aghour-local --port 4175
 Register a throwaway user in the app. To test plans locally, enable the flag in the dev database only:
 `bin/rails runner 'FeatureFlag.find_by!(key: "plans").update!(enabled: true)'`.
 
+## Deploy (GitHub Pages)
+
+`.github/workflows/deploy.yml` builds and publishes on every push to `main`:
+https://village-platform.github.io/pwa/
+
+- Built with `BASE_PATH=/pwa/` (a project site lives under the repo name). All public files go
+  through `asset()` / `import.meta.env.BASE_URL`, and the router uses it as `basename`.
+- Pages has no rewrites, so the workflow copies `index.html` to `404.html`: a deep link such as
+  `/pwa/firms/12` loads the app (with HTTP status 404, which browsers and iOS ignore).
+- Pages sends `Cache-Control: max-age=600` for every file and it cannot be changed. The service worker
+  still updates: browsers check `sw.js` past the HTTP cache, and new builds take over on next launch.
+- Custom domain later (e.g. `app.dorfsys.com`): add it under Settings → Pages, a CNAME record at
+  Cloudflare, and the repository variable `BASE_PATH=/`. Then set the backend's `CORS_ORIGINS`.
+
 ## v1 scope (same behaviour as the Android app for guests and normal users)
 
 - **Everyone:** Welcome (first launch), Home (greeting, bell, categories, cover banner, featured firms,

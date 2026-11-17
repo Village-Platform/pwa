@@ -1,4 +1,5 @@
 import { S } from "../lib/strings.js";
+import { asset } from "../lib/asset.js";
 
 // First launch only (Android WelcomeScreen): the splash artwork with "start" and "I have an account".
 const KEY = "aghour.welcomeDone";
@@ -11,7 +12,7 @@ export default function Welcome({ onDone }) {
   };
   return (
     <div className="fixed inset-0 bg-[#0B3727]">
-      <img src="/brand/welcome_splash.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+      <img src={asset("brand/welcome_splash.jpg")} alt="" className="absolute inset-0 w-full h-full object-cover" />
       <div className="absolute inset-x-0 top-[60%] px-7 flex flex-col items-center text-center">
         <p className="text-[#F4ECD9]/90 text-lg font-bold">{S.welcomeTitle}</p>
         <button

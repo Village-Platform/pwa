@@ -10,6 +10,7 @@ import Icon from "../components/Icon.jsx";
 import InstallBanner from "../components/InstallBanner.jsx";
 import PullToRefresh from "../components/PullToRefresh.jsx";
 import { BrandMark, ErrorBanner, FirmRow, IconTile, NewsRow, SearchPill, SectionHeader, SkeletonRows } from "../components/ui.jsx";
+import { asset } from "../lib/asset.js";
 
 export default function Home() {
   const nav = useNavigate();
@@ -86,10 +87,10 @@ export default function Home() {
         <div className="px-4 mt-4">
           {onAddFirm ? (
             <button onClick={onAddFirm} className="block w-full" aria-label={S.addYourFirm}>
-              <img src="/brand/cover_banner.jpg" alt="" className="w-full aspect-[2/1] object-cover rounded-2xl" />
+              <img src={asset("brand/cover_banner.jpg")} alt="" className="w-full aspect-[2/1] object-cover rounded-2xl" />
             </button>
           ) : (
-            <img src="/brand/cover_banner.jpg" alt="" className="w-full aspect-[2/1] object-cover rounded-2xl" />
+            <img src={asset("brand/cover_banner.jpg")} alt="" className="w-full aspect-[2/1] object-cover rounded-2xl" />
           )}
         </div>
 

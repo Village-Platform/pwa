@@ -3,6 +3,7 @@ import Icon from "./Icon.jsx";
 import { S } from "../lib/strings.js";
 import { assetUrl } from "../api/client.js";
 import { kindTone } from "../lib/format.js";
+import { asset } from "../lib/asset.js";
 
 // Web counterparts of the Android ui/components widgets (same names where they exist there).
 
@@ -134,13 +135,13 @@ export function IconTile({ url, size = 48 }) {
       style={{ width: size, height: size }}
     >
       <img
-        src={src || "/brand/mark_green.png"}
+        src={src || asset("brand/mark_green.png")}
         alt=""
         loading="lazy"
         className={src ? "w-full h-full object-cover" : "w-2/3 h-2/3 object-contain dark:hidden"}
-        onError={(e) => (e.currentTarget.src = "/brand/mark_green.png")}
+        onError={(e) => (e.currentTarget.src = asset("brand/mark_green.png"))}
       />
-      {!src && <img src="/brand/mark_cream.png" alt="" className="w-2/3 h-2/3 object-contain hidden dark:block" />}
+      {!src && <img src={asset("brand/mark_cream.png")} alt="" className="w-2/3 h-2/3 object-contain hidden dark:block" />}
     </div>
   );
 }
@@ -384,8 +385,8 @@ export function FormPage({ title, loading, loadError, onRetry, error, submitting
 export function BrandMark({ className = "h-10" }) {
   return (
     <>
-      <img src="/brand/mark_green.png" alt="" className={`${className} dark:hidden`} />
-      <img src="/brand/mark_cream.png" alt="" className={`${className} hidden dark:block`} />
+      <img src={asset("brand/mark_green.png")} alt="" className={`${className} dark:hidden`} />
+      <img src={asset("brand/mark_cream.png")} alt="" className={`${className} hidden dark:block`} />
     </>
   );
 }
