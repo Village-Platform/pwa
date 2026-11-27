@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { useLoad } from "../../lib/hooks";
+import { track } from "../../lib/analytics";
 import { egp, normalizeDigits } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
@@ -47,6 +48,7 @@ export default function Pay() {
       // can still create a second pending request; the admin review catches it (no idempotency key yet).
       await Api.subscribe({ planId: Number(planId), method: selected, reference, payerPhone });
       setSubmit({ busy: false, error: null });
+      track("subscription_request", { plan_id: Number(planId), method: selected });
       setDone(true);
     } catch (e) {
       setSubmit({ busy: false, error: e });

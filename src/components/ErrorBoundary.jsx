@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { reportError } from "../lib/analytics";
 import { S } from "../lib/strings";
 import { GoldButton, MessageBox } from "./ui.jsx";
 
@@ -12,6 +13,7 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error) {
     console.error(error);
+    reportError(error, { fatal: true });
   }
 
   render() {

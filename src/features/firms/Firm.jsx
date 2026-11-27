@@ -6,6 +6,7 @@ import { useSession } from "../../lib/session";
 import { firmStatusLabel, firmStatusTone, mapUrl, whatsappUrl } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
+import { track } from "../../lib/analytics";
 import ReviewControls from "../../components/ReviewControls.jsx";
 import { toast } from "../../components/Toast.jsx";
 import {
@@ -85,10 +86,25 @@ export default function Firm() {
         <h1 className="text-2xl font-black">{firm.name}</h1>
 
         <div className="grid grid-cols-3 gap-2.5">
-          <Tile icon="phone" label={S.call} href={phone && `tel:${phone}`} color="#1A7F37" dark="#3FB950" />
-          <Tile icon="chat" label={S.whatsapp} href={wa && whatsappUrl(wa)} color="#25D366" dark="#25D366" />
+          <Tile
+            icon="phone"
+            label={S.call}
+            href={phone && `tel:${phone}`}
+            onClick={() => track("contact_firm", { method: "call", firm_id: firm.id })}
+            color="#1A7F37"
+            dark="#3FB950"
+          />
+          <Tile
+            icon="chat"
+            label={S.whatsapp}
+            href={wa && whatsappUrl(wa)}
+            onClick={() => track("contact_firm", { method: "whatsapp", firm_id: firm.id })}
+            color="#25D366"
+            dark="#25D366"
+          />
           <Tile
             icon="place"
+            onClick={() => track("contact_firm", { method: "map", firm_id: firm.id })}
             label={S.location}
             href={hasCoords && mapUrl(firm.latitude, firm.longitude)}
             color="#D1242F"
@@ -221,7 +237,7 @@ function Overlay({ onClick, label, icon }) {
 }
 
 /** Call / WhatsApp / map tile in its own colour; grey and inert when the firm has no such data. */
-function Tile({ icon, label, href, color, dark }) {
+function Tile({ icon, label, href, onClick, color, dark }) {
   const isDark = document.documentElement.classList.contains("dark");
   const c = isDark ? dark : color;
   if (!href) {
@@ -234,6 +250,7 @@ function Tile({ icon, label, href, color, dark }) {
   return (
     <a
       href={href}
+      onClick={onClick}
       target={href.startsWith("http") ? "_blank" : undefined}
       rel="noreferrer"
       className="flex flex-col items-center gap-1 rounded-xl border py-3 text-sm font-bold active:opacity-70"

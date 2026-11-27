@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "../components/Toast.jsx";
 import { S } from "./strings";
+import { track } from "./analytics";
 import type { Page, PageMeta } from "../api/types";
 
 type DepList = readonly unknown[];
@@ -173,6 +174,10 @@ export function useOnline() {
 export function useShare() {
   return useCallback(({ title, text }: { title?: string; text?: string } = {}) => {
     const url = location.href;
+    track("share", {
+      method: typeof navigator.share === "function" ? "share_sheet" : "clipboard",
+      path: location.pathname,
+    });
     if (navigator.share) {
       navigator.share({ title, text, url }).catch(() => {});
     } else {

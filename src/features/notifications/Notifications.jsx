@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { usePaged } from "../../lib/hooks";
+import { track } from "../../lib/analytics";
 import { useSession } from "../../lib/session";
 import { useFlag } from "../../lib/features";
 import { notificationAction, notificationIcon, relativeTime } from "../../lib/format";
@@ -51,6 +52,7 @@ function Inbox() {
         toast(S.markReadFailed);
       });
     }
+    track("notification_open", { screen: n.data?.screen ?? "none", kind: n.kind });
     const to = notificationAction(n, { plansOn });
     if (to && to !== "/notifications") nav(to);
   };
