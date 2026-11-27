@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { guarded, routes, TAB_PATHS } from "@/routes.jsx";
 import { session } from "@/lib/session";
 
@@ -31,4 +31,22 @@ describe("route registry", () => {
     );
     expect(screen.getByText("login page")).toBeInTheDocument();
   });
+
+  it("sends a shared category link to the filtered directory", () => {
+    render(
+      <MemoryRouter initialEntries={["/categories/12"]}>
+        <Routes>
+          {routes.map((r) => (
+            <Route key={r.path} path={r.path} element={r.path === "/explore" ? <LocationProbe /> : r.element} />
+          ))}
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByTestId("where")).toHaveTextContent("/explore?category=12");
+  });
 });
+
+function LocationProbe() {
+  const l = useLocation();
+  return <p data-testid="where">{l.pathname + l.search}</p>;
+}
