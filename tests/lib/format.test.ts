@@ -1,5 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { egp, formatDate, relativeTime, validPhone, whatsappUrl } from "@/lib/format";
+import {
+  egp,
+  formatDate,
+  normalizeDigits,
+  parseCoordinates,
+  relativeTime,
+  validCoordinates,
+  validPhone,
+  whatsappUrl,
+} from "@/lib/format";
 
 describe("relativeTime", () => {
   const NOW = new Date("2026-11-27T12:00:00Z");
@@ -44,5 +53,35 @@ describe("format helpers", () => {
   it("validates Egyptian mobile numbers", () => {
     expect(validPhone("01012345678")).toBe(true);
     expect(validPhone("1012345678")).toBe(false);
+  });
+});
+
+describe("Arabic digits and coordinates", () => {
+  it("turns Arabic-Indic and Eastern Arabic-Indic digits into 0-9", () => {
+    expect(normalizeDigits("٠١٠١٢٣٤٥٦٧٨")).toBe("01012345678");
+    expect(normalizeDigits("۰۱۲۳۴۵۶۷۸۹")).toBe("0123456789");
+    expect(normalizeDigits("٣٠٫٥")).toBe("30.5");
+    expect(normalizeDigits("abc 12")).toBe("abc 12");
+  });
+
+  it("accepts a phone typed with Arabic digits", () => {
+    expect(validPhone("٠١٠١٢٣٤٥٦٧٨")).toBe(true);
+  });
+
+  it("checks coordinate ranges like the server", () => {
+    expect(validCoordinates("", "")).toBe(true);
+    expect(validCoordinates("30.28", "31.33")).toBe(true);
+    expect(validCoordinates("٣٠٫٢٨", "٣١٫٣٣")).toBe(true);
+    expect(validCoordinates("200", "31")).toBe(false);
+    expect(validCoordinates("30", "181")).toBe(false);
+    expect(validCoordinates("30", "")).toBe(false);
+    expect(validCoordinates("abc", "31")).toBe(false);
+  });
+
+  it("parses pasted coordinates, even with Arabic digits or a stray %", () => {
+    expect(parseCoordinates("https://maps.google.com/?q=30.36,31.21")).toEqual({ lat: 30.36, lng: 31.21 });
+    expect(parseCoordinates("٣٠٫٣٦, ٣١٫٢١")).toEqual({ lat: 30.36, lng: 31.21 });
+    expect(() => parseCoordinates("100% 30.36,31.21")).not.toThrow();
+    expect(parseCoordinates("100% 30.36,31.21")).toEqual({ lat: 30.36, lng: 31.21 });
   });
 });

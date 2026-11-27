@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Api } from "../../api/endpoints";
-import { validPhone } from "../../lib/format";
+import { normalizeDigits, validPhone } from "../../lib/format";
 import { session, useSession } from "../../lib/session";
 import { S } from "../../lib/strings";
 import { useForm } from "../../lib/useForm";
@@ -56,7 +56,7 @@ export default function EditProfile() {
         autoComplete="tel"
         dir="ltr"
         value={f.phone}
-        onChange={(e) => set({ phone: e.target.value })}
+        onChange={(e) => set({ phone: normalizeDigits(e.target.value) })}
         error={errors.phone}
       />
       <FormField

@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { useForm } from "../../lib/useForm";
 import { session } from "../../lib/session";
-import { validPhone } from "../../lib/format";
+import { normalizeDigits, validPhone } from "../../lib/format";
 import { S } from "../../lib/strings";
 import { BrandMark, ErrorBanner, FormField, GoldButton, ScreenTitle } from "../../components/ui.jsx";
 
@@ -54,7 +54,7 @@ export function Login() {
           autoComplete="tel"
           dir="ltr"
           value={f.phone}
-          onChange={(e) => set({ phone: e.target.value })}
+          onChange={(e) => set({ phone: normalizeDigits(e.target.value) })}
           error={errors.phone}
         />
         <FormField
@@ -98,7 +98,12 @@ export function Register() {
     onSuccess: finish,
   });
   const { values: f, set, errors } = form;
-  const bind = (k) => ({ value: f[k], onChange: (e) => set({ [k]: e.target.value }), error: errors[k] });
+  // Phone digits typed on an Arabic keyboard become 0-9.
+  const bind = (k) => ({
+    value: f[k],
+    onChange: (e) => set({ [k]: k === "phone" ? normalizeDigits(e.target.value) : e.target.value }),
+    error: errors[k],
+  });
 
   return (
     <div className="pb-8">

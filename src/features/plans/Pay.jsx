@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { useLoad } from "../../lib/hooks";
-import { egp } from "../../lib/format";
+import { egp, normalizeDigits } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
 import { toast } from "../../components/Toast.jsx";
@@ -137,7 +137,7 @@ export default function Pay() {
             inputMode="numeric"
             dir="ltr"
             value={payerPhone}
-            onChange={(e) => setPayerPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
+            onChange={(e) => setPayerPhone(normalizeDigits(e.target.value).replace(/\D/g, "").slice(0, 11))}
           />
           <ErrorBanner error={submit.error} />
           <GoldButton className="w-full" onClick={send} disabled={!selected || submit.busy}>

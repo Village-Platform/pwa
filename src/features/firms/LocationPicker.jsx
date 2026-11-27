@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { mapUrl, parseCoordinates } from "../../lib/format";
+import { mapUrl, parseCoordinates, validCoordinates } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
 import { FormField, GhostButton } from "../../components/ui.jsx";
@@ -10,7 +10,7 @@ export default function LocationPicker({ latitude, longitude, onChange, error })
   const [pasted, setPasted] = useState("");
   const [pasteError, setPasteError] = useState(null);
   const [gps, setGps] = useState({ busy: false, error: null });
-  const has = latitude !== "" && longitude !== "" && !isNaN(Number(latitude)) && !isNaN(Number(longitude));
+  const has = latitude !== "" && longitude !== "" && validCoordinates(latitude, longitude);
 
   const useGps = () => {
     if (!navigator.geolocation) return setGps({ busy: false, error: S.locationPermissionRequired });

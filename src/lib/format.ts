@@ -43,7 +43,29 @@ export function whatsappUrl(number: string) {
 
 export const mapUrl = (lat: number | string, lng: number | string) => `https://maps.google.com/?q=${lat},${lng}`;
 
-export const validPhone = (p: string) => /^01\d{9}$/.test(p.trim());
+/**
+ * Arabic-Indic (٠١٢…) and Eastern Arabic-Indic (۰۱۲…) digits, and the Arabic decimal separator (٫),
+ * as Latin ones. Arabic keyboards type these; the API and Number() expect 0-9.
+ */
+export function normalizeDigits(text: string) {
+  return text
+    .replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[\u06f0-\u06f9]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
+    .replace(/\u066b/g, ".");
+}
+
+export const validPhone = (p: string) => /^01\d{9}$/.test(normalizeDigits(p).trim());
+
+/** Both empty, or both numbers within range (lat ±90, lng ±180), like the server's rule F13. */
+export function validCoordinates(latitude: string, longitude: string) {
+  const lat = normalizeDigits(latitude).trim();
+  const lng = normalizeDigits(longitude).trim();
+  if (lat === "" && lng === "") return true;
+  if (lat === "" || lng === "") return false;
+  const a = Number(lat);
+  const b = Number(lng);
+  return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a) <= 90 && Math.abs(b) <= 180;
+}
 
 export const greeting = (S: { goodMorning: string; goodEvening: string }) =>
   new Date().getHours() < 12 ? S.goodMorning : S.goodEvening;
@@ -101,7 +123,13 @@ export function notificationAction(n: AppNotification, { plansOn }: { plansOn: b
 // expanded from the browser (no CORS), so those need the full link or the numbers.
 const COORD = /(-?\d{1,2}\.\d+)\s*[,;\s]\s*(-?\d{1,3}\.\d+)/;
 export function parseCoordinates(input: string) {
-  const m = decodeURIComponent(String(input)).match(COORD);
+  let text = normalizeDigits(String(input));
+  try {
+    text = decodeURIComponent(text);
+  } catch {
+    // Not URL-encoded (for example a bare "%"): match the text as it is.
+  }
+  const m = text.match(COORD);
   if (!m) return null;
   const lat = Number(m[1]);
   const lng = Number(m[2]);
