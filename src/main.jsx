@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { registerSW } from "virtual:pwa-register";
 import App from "./App.jsx";
-import { initTheme } from "./lib/theme.js";
-import { startFeatureFlags } from "./lib/features.js";
+import { initTheme } from "./lib/theme";
+import { startFeatureFlags } from "./lib/features";
 import "./index.css";
 
 initTheme();
