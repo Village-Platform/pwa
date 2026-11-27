@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes, useLocation, useNavigate } from "react-ro
 import { useEffect, useState } from "react";
 import TabBar from "./components/TabBar.jsx";
 import ToastHost from "./components/Toast.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import RequireUser from "./components/RequireUser.jsx";
 import PlansGate from "./components/PlansGate.jsx";
 import { useOnline } from "./lib/hooks.js";
@@ -58,43 +59,46 @@ function Shell() {
       {!online && (
         <div className="sticky top-0 z-40 bg-ink text-page text-center text-sm py-1.5 pt-safe">{S.offline}</div>
       )}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/explore" element={<Explore />} />
-        <Route path="/news" element={<News />} />
-        <Route path="/account" element={<Account />} />
+      {/* key: navigating to another screen clears a previous crash */}
+      <ErrorBoundary key={pathname}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/account" element={<Account />} />
 
-        <Route path="/firms/:id" element={<Firm />} />
-        <Route path="/news/:id" element={<Article />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/settings" element={<Settings />} />
+          <Route path="/firms/:id" element={<Firm />} />
+          <Route path="/news/:id" element={<Article />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/settings" element={<Settings />} />
 
-        {/* Signed-in users: owners manage their firms and submit news (the server reviews both). */}
-        <Route path="/my-firms" element={user(<MyFirms />)} />
-        <Route path="/firms/new" element={user(<FirmForm />)} />
-        <Route path="/firms/:id/edit" element={user(<FirmForm />)} />
-        <Route path="/articles/new" element={user(<ArticleForm />)} />
-        <Route path="/articles/:id/edit" element={user(<ArticleForm />)} />
-        <Route path="/change-password" element={user(<ChangePassword />)} />
-        <Route path="/delete-account" element={user(<DeleteAccount />)} />
+          {/* Signed-in users: owners manage their firms and submit news (the server reviews both). */}
+          <Route path="/my-firms" element={user(<MyFirms />)} />
+          <Route path="/firms/new" element={user(<FirmForm />)} />
+          <Route path="/firms/:id/edit" element={user(<FirmForm />)} />
+          <Route path="/articles/new" element={user(<ArticleForm />)} />
+          <Route path="/articles/:id/edit" element={user(<ArticleForm />)} />
+          <Route path="/change-password" element={user(<ChangePassword />)} />
+          <Route path="/delete-account" element={user(<DeleteAccount />)} />
 
-        {/* Behind the server's `plans` flag. Plans is open to guests; paying needs an account. */}
-        <Route path="/plans" element={plans(<Plans />)} />
-        <Route path="/pay/:planId" element={plans(user(<Pay />))} />
-        <Route path="/payments" element={plans(user(<Payments />))} />
+          {/* Behind the server's `plans` flag. Plans is open to guests; paying needs an account. */}
+          <Route path="/plans" element={plans(<Plans />)} />
+          <Route path="/pay/:planId" element={plans(user(<Pay />))} />
+          <Route path="/payments" element={plans(user(<Payments />))} />
 
-        <Route
-          path="*"
-          element={
-            <>
-              <ScreenTitle title="" />
-              <MessageBox text={S.notFound} />
-            </>
-          }
-        />
-      </Routes>
+          <Route
+            path="*"
+            element={
+              <>
+                <ScreenTitle title="" />
+                <MessageBox text={S.notFound} />
+              </>
+            }
+          />
+        </Routes>
+      </ErrorBoundary>
       {showTabs && <TabBar />}
       <ToastHost />
     </div>
