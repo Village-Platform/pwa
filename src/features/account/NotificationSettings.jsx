@@ -1,9 +1,20 @@
 import { useState } from "react";
 import { Api } from "../../api/endpoints";
 import { useLoad } from "../../lib/hooks";
+import { useFlag } from "../../lib/features";
+import { disablePush, enablePush, pushState } from "../../lib/push";
 import { S } from "../../lib/strings";
 import { toast } from "../../components/Toast.jsx";
-import { ErrorBanner, MessageBox, ScreenTitle, SkeletonRows, SurfaceCard, SwitchRow } from "../../components/ui.jsx";
+import {
+  ErrorBanner,
+  GhostButton,
+  GoldButton,
+  MessageBox,
+  ScreenTitle,
+  SkeletonRows,
+  SurfaceCard,
+  SwitchRow,
+} from "../../components/ui.jsx";
 
 /** Opt in or out of push topics (news, announcements...). The choice is saved as soon as it is made. */
 export default function NotificationSettings() {
@@ -27,6 +38,7 @@ export default function NotificationSettings() {
   return (
     <div className="pb-8">
       <ScreenTitle title={S.notificationSettings} />
+      <PushOnThisDevice />
       <h2 className="px-4 mt-5 font-bold">{S.topicsTitle}</h2>
       <p className="px-4 mt-1 mb-3 text-sm text-muted">{S.topicsHint}</p>
       {loading && !data && <SkeletonRows count={3} />}
@@ -47,5 +59,58 @@ export default function NotificationSettings() {
         </SurfaceCard>
       )}
     </div>
+  );
+}
+
+/**
+ * Turns web push on or off for this browser. Shown only when the server's `web_push` flag is on: until the
+ * backend accepts web devices, registering would fail.
+ */
+function PushOnThisDevice() {
+  const enabled = useFlag("web_push");
+  const [state, setState] = useState(() => pushState());
+  const [busy, setBusy] = useState(false);
+  if (!enabled) return null;
+
+  const turnOn = async () => {
+    setBusy(true);
+    try {
+      setState(await enablePush());
+    } catch {
+      toast(S.pushFailed);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const turnOff = async () => {
+    setBusy(true);
+    await disablePush();
+    setState(pushState());
+    setBusy(false);
+  };
+
+  return (
+    <SurfaceCard className="mx-4 mt-5 p-4 space-y-3">
+      <h2 className="font-bold">{S.pushTitle}</h2>
+      {state === "on" ? (
+        <>
+          <p className="text-sm text-goldInk font-semibold">{S.pushOn}</p>
+          <GhostButton className="w-full" disabled={busy} onClick={turnOff}>
+            {S.pushDisable}
+          </GhostButton>
+        </>
+      ) : state === "denied" ? (
+        <p className="text-sm text-bad">{S.pushDenied}</p>
+      ) : state === "unsupported" ? (
+        <p className="text-sm text-muted">{S.pushUnsupported}</p>
+      ) : (
+        <>
+          <p className="text-sm text-muted">{S.pushHint}</p>
+          <GoldButton className="w-full" disabled={busy} onClick={turnOn}>
+            {busy ? S.loading : S.pushEnable}
+          </GoldButton>
+        </>
+      )}
+    </SurfaceCard>
   );
 }

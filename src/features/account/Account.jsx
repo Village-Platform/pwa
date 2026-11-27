@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { isReviewer } from "../../components/RequireReviewer.jsx";
 import { useLoad } from "../../lib/hooks";
+import { detachPush } from "../../lib/push";
 import { session, useSession } from "../../lib/session";
 import { useFlag } from "../../lib/features";
 import { S } from "../../lib/strings";
@@ -154,10 +155,12 @@ function Profile({ user, onAbout }) {
           body={S.logoutConfirmBody}
           confirm={S.logout}
           onCancel={() => setConfirmLogout(false)}
-          onConfirm={() => {
-            // Android also detaches its push device here; the web app has none until web push lands.
-            session.clear();
+          onConfirm={async () => {
             setConfirmLogout(false);
+            // Like Android: while the user's token still works, detach this device from them so it stops
+            // getting their personal pushes. Does nothing when push is off.
+            await detachPush();
+            session.clear();
           }}
         />
       )}

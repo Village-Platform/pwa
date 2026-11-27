@@ -65,3 +65,16 @@ describe("public article feed", () => {
     expect(res.data.map((x) => x.id)).toEqual([1, 6]);
   });
 });
+
+describe("devices", () => {
+  it("registers this install with its push token, and detaches it", async () => {
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation(async () => json(200, { data: {} }));
+    await Api.registerDevice({ token: "tok", platform: "web", locale: "ar" });
+    expect(lastCall(spy).init.method).toBe("PUT");
+    expect(lastCall(spy).url.pathname).toMatch(/\/devices\/[^/]+$/);
+    expect(JSON.parse(lastCall(spy).init.body as string)).toEqual({ token: "tok", platform: "web", locale: "ar" });
+    await Api.detachDevice();
+    expect(lastCall(spy).init.method).toBe("POST");
+    expect(lastCall(spy).url.pathname).toMatch(/\/detach$/);
+  });
+});

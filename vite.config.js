@@ -44,6 +44,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Shows Firebase Cloud Messaging pushes and routes their taps (src/lib/push.ts).
+        importScripts: ["push-sw.js"],
         // App shell: every navigation gets index.html from the cache, so the app opens offline.
         navigateFallback: `${base}index.html`,
         globPatterns: ["**/*.{js,css,html,png,jpg,svg,ttf}"],

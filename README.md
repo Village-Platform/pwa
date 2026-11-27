@@ -69,8 +69,8 @@ https://village-platform.github.io/pwa/
 - **Reviewers (`admin`, `super_admin`):** the review queue (`/review`), and approve / reject with a
   reason on a firm or article page. The buttons show only when the server's `can.review` says so.
 
-Not yet: super-admin category and plan editors (use the server's `/admin` dashboard), device
-registration and web push (the server accepts only `platform: android` for now).
+Not yet: super-admin category and plan editors (use the server's `/admin` dashboard). Web push is
+built but waits for the backend (see Firebase below).
 
 ## Development
 
@@ -143,10 +143,31 @@ reports, and import converted modules without an extension.
   `scrollTo` returns a Promise, which React treats as a cleanup and crashes on); navigate with
   `flushSync` before clearing the session, because `useSyncExternalStore` re-renders synchronously.
 
-## Next: web push on iOS (16.4+, installed app only)
+## Firebase: Analytics and push notifications
 
-The backend sends with FCM HTTP v1 (topics + conditions). The Firebase JS SDK supports Safari web
-push, so the plan is: Firebase web app config + VAPID key, `firebase-messaging-sw.js`,
-`PUT devices/:installation_id` with `platform: "web"` (backend: add `"web"` to `Device::PLATFORMS`,
-an additive change), and a `webpush.fcm_options.link` in `Fcm::Message`. To verify first: that
-topic subscription (legacy Instance ID API, removed 2027-09-29) accepts web tokens.
+Firebase is optional: set the `VITE_FIREBASE_*` variables (see `.env.example`; in CI they are repository
+variables) and it turns on. Without them the app works exactly as before. The SDK loads on demand, in its
+own chunks.
+
+**Setup:** in the Firebase console, add a **Web app** to the same project as the Android release build
+(`aghour-app`), copy its config into the variables, enable Google Analytics for the measurement id, and
+create a key pair under Cloud Messaging → Web Push certificates for `VITE_FIREBASE_VAPID_KEY`.
+
+**Analytics** (`src/lib/analytics.ts`): screen views, login, sign-up, search, share, contacting a firm
+(call, WhatsApp, map), opening a notification, submitting a firm or article, a subscription request and
+turning push on. Users are tagged by numeric id and role only. Errors (uncaught errors, unhandled promise
+rejections and crashes caught by the error boundary) go to Analytics as `exception` events, because
+Crashlytics has no web SDK.
+
+**Push** (`src/lib/push.ts`, `public/push-sw.js`): Settings → Notifications → "enable notifications"
+asks for permission, gets an FCM token for this browser, and registers it with
+`PUT devices/:installation_id` (`platform: "web"`). The service worker shows incoming pushes and opens the
+screen from the payload's `screen` and `id` (unknown screens open the inbox). The device is registered
+again after sign-in and sign-out, and detached from the user before logout, like the Android app.
+On iPhone, push works only once the app is added to the Home Screen (iOS 16.4+).
+
+**Backend work before push can be used:** the server accepts only `platform: "android"` today. It needs
+`"web"` added to the device platforms, and a `webpush` block (with `fcm_options.link`) in the FCM message.
+The section stays hidden until the server sends the `web_push` feature flag as `true` in `app_config`, so
+turn that flag on only after the backend change. Also check that topic subscription (legacy Instance ID
+API, removed 2027-09-29) accepts web tokens.
