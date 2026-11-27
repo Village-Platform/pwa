@@ -373,10 +373,11 @@ function Modal({ title, lead, onClose, className = "", children }) {
   );
 }
 
-export function Dialog({ title, body, confirm, onConfirm, onCancel, danger, busy }) {
+export function Dialog({ title, body, confirm, onConfirm, onCancel, danger, busy, children }) {
   return (
     <Modal title={title} onClose={onCancel}>
       {body && <p className="text-muted mt-2 leading-relaxed">{body}</p>}
+      {children}
       <div className="flex gap-2 mt-5">
         {danger ? (
           <DangerButton className="flex-1" onClick={onConfirm} disabled={busy}>

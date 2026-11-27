@@ -6,6 +6,7 @@ import { useSession } from "../../lib/session";
 import { firmStatusTone, mapUrl, whatsappUrl } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
+import ReviewControls from "../../components/ReviewControls.jsx";
 import { toast } from "../../components/Toast.jsx";
 import {
   Badge,
@@ -30,6 +31,8 @@ function access(firm, user) {
     edit: firm.can?.update ?? !!owns,
     destroy: firm.can?.destroy ?? !!owns,
     moderate: firm.can?.moderate ?? isAdmin,
+    // Only the server says so (no fallback): a reviewer may approve or reject what is pending.
+    review: firm.can?.review ?? false,
   };
 }
 
@@ -99,6 +102,16 @@ export default function Firm() {
           <>
             <hr className="border-line" />
             <p className="leading-relaxed whitespace-pre-line">{firm.description}</p>
+          </>
+        )}
+
+        {can.review && firm.status === "pending" && (
+          <>
+            <hr className="border-line" />
+            <div className="space-y-2">
+              <h2 className="font-bold">{S.reviewFirmTitle}</h2>
+              <ReviewControls kind="firm" id={firm.id} onChanged={(f) => setOverride(f)} />
+            </div>
           </>
         )}
 

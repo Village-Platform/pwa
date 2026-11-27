@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Api } from "../../api/endpoints";
+import { isReviewer } from "../../components/RequireReviewer.jsx";
 import { useLoad } from "../../lib/hooks";
 import { session, useSession } from "../../lib/session";
 import { useFlag } from "../../lib/features";
@@ -123,6 +124,7 @@ function Profile({ user, onAbout }) {
             trailing={String(data.firms.length)}
             onClick={() => nav("/my-firms")}
           />
+          {isReviewer(user) && <Row icon="verified" label={S.reviewQueue} onClick={() => nav("/review")} />}
           <Row icon="addBusiness" label={S.addFirm} onClick={() => nav("/firms/new")} />
           <Row icon="news" label={S.myArticles} onClick={() => nav("/my-articles")} />
           <Row icon="postAdd" label={S.addArticle} onClick={() => nav("/articles/new")} />

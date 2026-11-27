@@ -1,15 +1,19 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { useLoad, useShare } from "../../lib/hooks";
 import { formatDate, kindTone } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
+import ReviewControls from "../../components/ReviewControls.jsx";
 import { Badge, ErrorBanner, ScreenTitle, SkeletonRows } from "../../components/ui.jsx";
 
 export default function Article() {
   const { id } = useParams();
   const nav = useNavigate();
-  const { data: a, error, loading, reload } = useLoad(() => Api.article(id).then((r) => r.data), [id]);
+  const { data: loaded, error, loading, reload } = useLoad(() => Api.article(id).then((r) => r.data), [id]);
+  const [override, setOverride] = useState(null); // article after approve / reject
+  const a = override?.id === loaded?.id ? override : loaded;
 
   const shareArticle = useShare();
   const share = () => shareArticle({ title: a.title });
@@ -47,6 +51,15 @@ export default function Article() {
           <p className="text-sm text-muted mt-1">{a.author?.name}</p>
           {/* Plain text from the API, rendered as text (never as HTML). */}
           <p className="mt-5 leading-loose whitespace-pre-line text-[17px]">{a.body}</p>
+          {a.rejection_reason && a.review_status === "rejected" && (
+            <p className="mt-4 text-sm text-bad">{a.rejection_reason}</p>
+          )}
+          {a.can?.review && a.review_status === "pending" && (
+            <div className="mt-6 space-y-2 border-t border-line pt-4">
+              <h2 className="font-bold">{S.reviewArticle}</h2>
+              <ReviewControls kind="article" id={a.id} onChanged={(x) => setOverride(x)} />
+            </div>
+          )}
         </article>
       )}
     </div>
