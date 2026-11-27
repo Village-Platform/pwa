@@ -15,6 +15,7 @@ import {
   CheckLine,
   DangerButton,
   Dialog,
+  ErrorBanner,
   GhostButton,
   GoldButton,
   LetterAvatar,
@@ -78,28 +79,25 @@ function Profile({ user, onAbout }) {
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   // Each time the profile is shown: role / subscription / firms may have changed on the server.
-  // Failures leave the counts at zero rather than blocking the screen.
-  const { data: loaded } = useLoad(async () => {
+  // A failure shows a retry instead of zeros: "0 firms" and "Subscribe now" would be wrong for an owner
+  // with an active plan.
+  const profile = useLoad(async () => {
     Api.me()
       .then((r) => session.setUser(r.data))
       .catch(() => {});
     const [firms, subs] = await Promise.all([
-      Api.myFirms({ perPage: 50 })
-        .then((r) => r.data)
-        .catch(() => []),
-      plansOn
-        ? Api.subscriptions({ perPage: 50 })
-            .then((r) => r.data)
-            .catch(() => [])
-        : [],
+      Api.myFirms({ perPage: 1 }),
+      plansOn ? Api.subscriptions({ perPage: 50 }).then((r) => r.data) : [],
     ]);
     return {
-      firms,
+      firmCount: firms.meta?.total ?? firms.data.length,
+      firstFirmName: firms.data[0]?.name ?? null,
       current: subs.find((s) => s.state === "current") || null,
-      pending: subs.find((s) => s.state === "pending") || null,
+      // `status` is what is stored; `state` is derived from dates and may not say "pending".
+      pending: subs.find((s) => s.status === "pending" || s.state === "pending") || null,
     };
   }, [user.id, plansOn]);
-  const data = loaded ?? { firms: [], current: null, pending: null };
+  const data = profile.data;
 
   return (
     <>
@@ -115,13 +113,19 @@ function Profile({ user, onAbout }) {
       </div>
 
       <div className="p-4 space-y-3.5">
-        {plansOn && <SubscriptionCard data={data} onPlans={() => nav("/plans")} />}
+        {!data && profile.error ? (
+          <ErrorBanner error={profile.error} onRetry={profile.reload} />
+        ) : plansOn && !data ? (
+          <div className="h-24 rounded-2xl bg-surface2 animate-pulse" aria-label={S.loading} />
+        ) : plansOn ? (
+          <SubscriptionCard data={data} onPlans={() => nav("/plans")} />
+        ) : null}
         <InstallBanner />
         <SurfaceCard className="overflow-hidden divide-y divide-line">
           <Row
             icon="storefront"
             label={S.myFirms}
-            trailing={String(data.firms.length)}
+            trailing={data ? String(data.firmCount) : null}
             onClick={() => nav("/my-firms")}
           />
           {isReviewer(user) && <Row icon="verified" label={S.reviewQueue} onClick={() => nav("/review")} />}
@@ -163,13 +167,13 @@ function Profile({ user, onAbout }) {
 
 /** Current plan with days left, a pending request, or a call to subscribe (Android SubscriptionCard). */
 function SubscriptionCard({ data, onPlans }) {
-  const { current, pending, firms } = data;
+  const { current, pending, firstFirmName } = data;
   const total = Math.max(current?.plan.duration_days || 1, 1);
   const left = Math.min(Math.max(current?.days_left ?? 0, 0), total);
   return (
     <SurfaceCard className="p-4">
       <div className="flex items-center gap-2">
-        <p className="font-bold flex-1 truncate">{firms[0]?.name || S.subscriptionAndPlans}</p>
+        <p className="font-bold flex-1 truncate">{firstFirmName || S.subscriptionAndPlans}</p>
         {current ? (
           <Badge icon="verified">{S.verified}</Badge>
         ) : pending ? (
