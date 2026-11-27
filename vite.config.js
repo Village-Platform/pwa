@@ -54,12 +54,15 @@ export default defineConfig({
             urlPattern: ({ url, request }) =>
               request.method === "GET" &&
               /\/api\/v1\/(categories|firms|articles|app_config)/.test(url.pathname) &&
-              !url.pathname.endsWith("/icon"),
+              !url.pathname.endsWith("/icon") &&
+              // Owner- and reviewer-specific lists must never be served from a shared cache.
+              !url.searchParams.has("mine") &&
+              !url.searchParams.has("review"),
             handler: "NetworkFirst",
             options: {
               cacheName: "api-read",
               networkTimeoutSeconds: 3,
-              expiration: { maxEntries: 200, maxAgeSeconds: 7 * 24 * 3600 },
+              expiration: { maxEntries: 200, maxAgeSeconds: 24 * 3600 },
               cacheableResponse: { statuses: [200] },
             },
           },
