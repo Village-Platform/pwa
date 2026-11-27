@@ -4,8 +4,8 @@ The iPhone (and any browser) version of the Aghour village app: a Progressive We
 Rails API as the Android app (`/api/v1/`). iPhone users install it from Safari with
 Share → "Add to Home Screen" (the app shows a guide).
 
-Stack: React 18, Vite 5, Tailwind 3, `vite-plugin-pwa` (Workbox). Works on Node 18
-(`serialize-javascript` is pinned in `overrides` because v7 needs Node 20).
+Stack: React 18, Vite 5, Tailwind 3, `vite-plugin-pwa` (Workbox). Needs Node 22.22+, 24.15+ or 26+
+(the test environment, jsdom 31, requires it); `.nvmrc` pins 24, which CI and deploys use.
 
 ## Run
 
