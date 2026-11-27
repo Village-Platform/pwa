@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Icon from "./Icon.jsx";
 import { GoldButton } from "./ui.jsx";
-import { S } from "../lib/strings.js";
+import { S } from "../lib/strings";
 
 // iOS has no install prompt: the user must use Safari's Share → "Add to Home Screen", and only an
 // installed web app can receive push on iOS (16.4+). Android Chrome fires beforeinstallprompt.

@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useSession } from "../lib/session.js";
+import { useSession } from "../lib/session";
 
 /** Screens that need an account send guests to Login, then back here (Android: nav.go(LoginRoute)). */
 export default function RequireUser({ children }) {
