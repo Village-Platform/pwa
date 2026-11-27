@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Api } from "../../api/endpoints";
 import { useDebounced, useLoad, usePaged } from "../../lib/hooks";
 import { S } from "../../lib/strings";
@@ -9,9 +9,24 @@ import { FilterChipsRow, FirmRow, ScreenTitle, SearchPill } from "../../componen
 export default function Explore() {
   const nav = useNavigate();
   const [params, setParams] = useSearchParams();
-  const categoryId = params.get("category") ? Number(params.get("category")) : null;
-  const [q, setQ] = useState("");
+  const categoryParam = Number(params.get("category"));
+  const categoryId = Number.isInteger(categoryParam) && categoryParam > 0 ? categoryParam : null;
+  // The search lives in the URL (?q=), so Back from a firm returns to the same results.
+  const [q, setQ] = useState(() => params.get("q") ?? "");
   const query = useDebounced(q.trim());
+  const urlQuery = params.get("q") ?? "";
+  useEffect(() => {
+    if (urlQuery === query) return;
+    setParams(
+      (p) => {
+        const next = new URLSearchParams(p);
+        if (query) next.set("q", query);
+        else next.delete("q");
+        return next;
+      },
+      { replace: true },
+    );
+  }, [query, urlQuery, setParams]);
 
   const cats = useLoad(() => Api.categories().then((r) => r.data));
   const list = usePaged((page) => Api.firms({ q: query, categoryId, page }), [query, categoryId]);
@@ -27,7 +42,18 @@ export default function Explore() {
       <FilterChipsRow
         items={chips}
         selected={categoryId}
-        onSelect={(v) => setParams(v ? { category: String(v) } : {}, { replace: true })}
+        onSelect={(v) =>
+          setParams(
+            (p) => {
+              const next = new URLSearchParams(p);
+              if (v) next.set("category", String(v));
+              else next.delete("category");
+              next.delete("focus");
+              return next;
+            },
+            { replace: true },
+          )
+        }
       />
       {!list.loading && !list.error && list.items.length > 0 && (
         <p className="px-4 text-sm text-muted mb-2">{S.resultsCount(list.total)}</p>
