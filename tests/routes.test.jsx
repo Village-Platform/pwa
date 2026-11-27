@@ -44,6 +44,10 @@ describe("route registry", () => {
     );
     expect(screen.getByTestId("where")).toHaveTextContent("/explore?category=12");
   });
+
+  it("keeps reviewer screens behind the reviewer guard", () => {
+    expect(routes.find((r) => r.path === "/review").guards).toEqual(["reviewer"]);
+  });
 });
 
 function LocationProbe() {

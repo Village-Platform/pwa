@@ -11,9 +11,20 @@ beforeEach(() => {
 
 const lastCall = (spy: Parameters<typeof sent>[0]) => sent(spy);
 
-describe("lists and topics", () => {
-  it("asks for own articles and unread notifications", async () => {
+describe("review, lists and topics", () => {
+  it("rejects with a reason", async () => {
+    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: {} }));
+    await Api.rejectFirm(5, "بيانات ناقصة");
+    const { url, init } = lastCall(spy);
+    expect(url.pathname).toMatch(/\/firms\/5\/reject$/);
+    expect(init.method).toBe("PATCH");
+    expect(JSON.parse(init.body as string)).toEqual({ reason: "بيانات ناقصة" });
+  });
+
+  it("asks for pending items, own articles and unread notifications", async () => {
     const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: [] }));
+    await Api.pendingArticles();
+    expect(lastCall(spy).url.searchParams.get("review")).toBe("pending");
     await Api.myArticles();
     expect(lastCall(spy).url.searchParams.get("mine")).toBe("true");
     await Api.notifications({ unread: true });
