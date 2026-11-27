@@ -43,7 +43,12 @@ export default function LocationPicker({ latitude, longitude, onChange, error })
       <p className={`text-sm ${has ? "text-goldInk font-semibold" : "text-muted"}`}>
         {has ? `${S.locationSet} (${Number(latitude).toFixed(5)}, ${Number(longitude).toFixed(5)})` : S.locationNotSet}
       </p>
-      <GhostButton type="button" className="w-full flex items-center justify-center gap-2" onClick={useGps} disabled={gps.busy}>
+      <GhostButton
+        type="button"
+        className="w-full flex items-center justify-center gap-2"
+        onClick={useGps}
+        disabled={gps.busy}
+      >
         <Icon name="gps" size={20} />
         {gps.busy ? S.fetchingLocation : S.useCurrentLocation}
       </GhostButton>
@@ -57,8 +62,20 @@ export default function LocationPicker({ latitude, longitude, onChange, error })
         error={pasteError}
       />
       <div className="grid grid-cols-2 gap-2">
-        <FormField label={S.latitude} inputMode="decimal" dir="ltr" value={latitude} onChange={(e) => onChange(e.target.value, longitude)} />
-        <FormField label={S.longitude} inputMode="decimal" dir="ltr" value={longitude} onChange={(e) => onChange(latitude, e.target.value)} />
+        <FormField
+          label={S.latitude}
+          inputMode="decimal"
+          dir="ltr"
+          value={latitude}
+          onChange={(e) => onChange(e.target.value, longitude)}
+        />
+        <FormField
+          label={S.longitude}
+          inputMode="decimal"
+          dir="ltr"
+          value={longitude}
+          onChange={(e) => onChange(latitude, e.target.value)}
+        />
       </div>
       {error && <p className="text-sm text-bad">{error}</p>}
       {has && (

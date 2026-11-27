@@ -65,13 +65,21 @@ export default function Firm() {
       </div>
 
       <div className="-mt-6 relative rounded-t-3xl bg-page p-5 space-y-4">
-        {firm.status !== "active" && <Badge tone={firmStatusTone(firm.status)}>{S.firmStatus[firm.status] || firm.status}</Badge>}
+        {firm.status !== "active" && (
+          <Badge tone={firmStatusTone(firm.status)}>{S.firmStatus[firm.status] || firm.status}</Badge>
+        )}
         <h1 className="text-2xl font-black">{firm.name}</h1>
 
         <div className="grid grid-cols-3 gap-2.5">
           <Tile icon="phone" label={S.call} href={phone && `tel:${phone}`} color="#1A7F37" dark="#3FB950" />
           <Tile icon="chat" label={S.whatsapp} href={wa && whatsappUrl(wa)} color="#25D366" dark="#25D366" />
-          <Tile icon="place" label={S.location} href={hasCoords && mapUrl(firm.latitude, firm.longitude)} color="#D1242F" dark="#FF7B72" />
+          <Tile
+            icon="place"
+            label={S.location}
+            href={hasCoords && mapUrl(firm.latitude, firm.longitude)}
+            color="#D1242F"
+            dark="#FF7B72"
+          />
         </div>
 
         <hr className="border-line" />
@@ -130,20 +138,30 @@ function ManageControls({ firm, can, onEdit, onChanged, onDeleted }) {
     <div className="space-y-2">
       <h2 className="font-bold">{S.manageFirm}</h2>
       <div className="flex gap-2">
-        {can.edit && <GhostButton className="flex-1" onClick={onEdit}>{S.edit}</GhostButton>}
+        {can.edit && (
+          <GhostButton className="flex-1" onClick={onEdit}>
+            {S.edit}
+          </GhostButton>
+        )}
         {/* Owners cannot approve their own firm. */}
         {can.moderate && (
           <GhostButton
             className="flex-1"
             disabled={busy}
             onClick={() =>
-              run(async () => onChanged((await Api.setFirmStatus(firm.id, firm.status === "active" ? "suspended" : "active")).data))
+              run(async () =>
+                onChanged((await Api.setFirmStatus(firm.id, firm.status === "active" ? "suspended" : "active")).data),
+              )
             }
           >
             {firm.status === "active" ? S.suspend : S.approve}
           </GhostButton>
         )}
-        {can.destroy && <DangerButton className="flex-1" disabled={busy} onClick={() => setConfirm(true)}>{S.delete}</DangerButton>}
+        {can.destroy && (
+          <DangerButton className="flex-1" disabled={busy} onClick={() => setConfirm(true)}>
+            {S.delete}
+          </DangerButton>
+        )}
       </div>
       <ErrorBanner error={error} />
       {confirm && (
@@ -168,7 +186,11 @@ function ManageControls({ firm, can, onEdit, onChanged, onDeleted }) {
 
 function Overlay({ onClick, label, icon }) {
   return (
-    <button onClick={onClick} aria-label={label} className="w-10 h-10 rounded-full bg-black/35 text-white grid place-items-center backdrop-blur">
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="w-10 h-10 rounded-full bg-black/35 text-white grid place-items-center backdrop-blur"
+    >
       <Icon name={icon} />
     </button>
   );

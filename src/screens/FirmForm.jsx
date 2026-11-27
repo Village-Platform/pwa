@@ -8,7 +8,18 @@ import { toast } from "../components/Toast.jsx";
 import { AlertBox, FieldLabel, FilterChipsRow, FormField, FormPage, Segmented, TextArea } from "../components/ui.jsx";
 
 const STATUSES = ["active", "pending", "suspended"];
-const EMPTY = { categoryId: null, name: "", description: "", phone: "", whatsapp: "", address: "", latitude: "", longitude: "", workingHours: "", status: "active" };
+const EMPTY = {
+  categoryId: null,
+  name: "",
+  description: "",
+  phone: "",
+  whatsapp: "",
+  address: "",
+  latitude: "",
+  longitude: "",
+  workingHours: "",
+  status: "active",
+};
 
 /** Create (/firms/new) or edit (/firms/:id/edit). Owners never send a status; the super admin may. */
 export default function FirmForm() {
@@ -68,7 +79,8 @@ export default function FirmForm() {
     if (submit.busy) return;
     const lat = f.latitude.trim();
     const lng = f.longitude.trim();
-    const coordsOk = (lat === "" && lng === "") || (lat !== "" && lng !== "" && !isNaN(Number(lat)) && !isNaN(Number(lng)));
+    const coordsOk =
+      (lat === "" && lng === "") || (lat !== "" && lng !== "" && !isNaN(Number(lat)) && !isNaN(Number(lng)));
     const errs = {};
     if (!f.name.trim()) errs.name = S.errorRequired;
     if (!f.categoryId) errs.category = S.errorCategoryRequired;
@@ -114,7 +126,12 @@ export default function FirmForm() {
         submitting={submit.busy}
         onSave={save}
       >
-        <FormField label={S.firmName} value={f.name} onChange={(e) => set({ name: e.target.value })} error={errors.name} />
+        <FormField
+          label={S.firmName}
+          value={f.name}
+          onChange={(e) => set({ name: e.target.value })}
+          error={errors.name}
+        />
         <div>
           <FieldLabel>{S.firmCategory}</FieldLabel>
           <div className="-mx-4">
@@ -142,10 +159,28 @@ export default function FirmForm() {
           <p className="text-sm text-muted">{S.firmEditReviewNote}</p>
         ) : null}
 
-        <FormField label={S.phone} type="tel" inputMode="tel" dir="ltr" value={f.phone} onChange={(e) => set({ phone: e.target.value })} />
-        <FormField label={S.whatsapp} type="tel" inputMode="tel" dir="ltr" value={f.whatsapp} onChange={(e) => set({ whatsapp: e.target.value })} />
+        <FormField
+          label={S.phone}
+          type="tel"
+          inputMode="tel"
+          dir="ltr"
+          value={f.phone}
+          onChange={(e) => set({ phone: e.target.value })}
+        />
+        <FormField
+          label={S.whatsapp}
+          type="tel"
+          inputMode="tel"
+          dir="ltr"
+          value={f.whatsapp}
+          onChange={(e) => set({ whatsapp: e.target.value })}
+        />
         <FormField label={S.address} value={f.address} onChange={(e) => set({ address: e.target.value })} />
-        <FormField label={S.workingHours} value={f.workingHours} onChange={(e) => set({ workingHours: e.target.value })} />
+        <FormField
+          label={S.workingHours}
+          value={f.workingHours}
+          onChange={(e) => set({ workingHours: e.target.value })}
+        />
         <LocationPicker
           latitude={f.latitude}
           longitude={f.longitude}

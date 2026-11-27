@@ -3,7 +3,15 @@ import { useState } from "react";
 import { Api } from "../api/endpoints.js";
 import { useDebounced, useLoad, useOnVisible, usePaged } from "../lib/hooks.js";
 import { S } from "../lib/strings.js";
-import { ErrorBanner, FilterChipsRow, FirmRow, MessageBox, ScreenTitle, SearchPill, SkeletonRows } from "../components/ui.jsx";
+import {
+  ErrorBanner,
+  FilterChipsRow,
+  FirmRow,
+  MessageBox,
+  ScreenTitle,
+  SearchPill,
+  SkeletonRows,
+} from "../components/ui.jsx";
 
 export default function Explore() {
   const nav = useNavigate();

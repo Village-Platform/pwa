@@ -25,7 +25,12 @@ export default function News() {
       <FilterChipsRow items={KINDS} selected={kind} onSelect={setKind} />
       <div className="px-4 space-y-2">
         {list.items.map((a) => (
-          <NewsRow key={a.id} article={a} relative={relativeTime(a.published_at)} onClick={() => nav(`/news/${a.id}`)} />
+          <NewsRow
+            key={a.id}
+            article={a}
+            relative={relativeTime(a.published_at)}
+            onClick={() => nav(`/news/${a.id}`)}
+          />
         ))}
       </div>
       {list.loading && <SkeletonRows count={list.items.length ? 2 : 5} />}

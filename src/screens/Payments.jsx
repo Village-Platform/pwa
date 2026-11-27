@@ -19,7 +19,8 @@ export default function Payments() {
             </div>
             <p className="text-lg font-black">{egp(s.amount_cents)}</p>
             <p className="text-sm text-muted">
-              {S.paymentMethod[s.payment_method] || s.payment_method} · {S.reference} <span dir="ltr">{s.transaction_reference}</span>
+              {S.paymentMethod[s.payment_method] || s.payment_method} · {S.reference}{" "}
+              <span dir="ltr">{s.transaction_reference}</span>
             </p>
             <p className="text-sm text-muted">
               {[formatDate(s.created_at), s.ends_at && S.until(formatDate(s.ends_at))].filter(Boolean).join(" · ")}

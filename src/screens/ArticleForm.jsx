@@ -3,7 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../api/endpoints.js";
 import { S } from "../lib/strings.js";
 import { toast } from "../components/Toast.jsx";
-import { AlertBox, DangerButton, Dialog, FieldLabel, FormField, FormPage, Segmented, SwitchRow, TextArea } from "../components/ui.jsx";
+import {
+  AlertBox,
+  DangerButton,
+  Dialog,
+  FieldLabel,
+  FormField,
+  FormPage,
+  Segmented,
+  SwitchRow,
+  TextArea,
+} from "../components/ui.jsx";
 
 const KINDS = ["news", "announcement", "article"];
 
@@ -93,20 +103,40 @@ export default function ArticleForm() {
         onSave={save}
         extra={
           articleId && (
-            <DangerButton type="button" className="w-full" onClick={() => setConfirmDelete(true)} disabled={submit.busy}>
+            <DangerButton
+              type="button"
+              className="w-full"
+              onClick={() => setConfirmDelete(true)}
+              disabled={submit.busy}
+            >
               {S.delete}
             </DangerButton>
           )
         }
       >
-        <FormField label={S.articleTitle} value={f.title} onChange={(e) => set({ title: e.target.value })} error={errors.title} />
+        <FormField
+          label={S.articleTitle}
+          value={f.title}
+          onChange={(e) => set({ title: e.target.value })}
+          error={errors.title}
+        />
         <div>
           <FieldLabel>{S.articleKind}</FieldLabel>
-          <Segmented options={KINDS.map((k) => ({ value: k, label: S.kind[k] }))} selected={f.kind} onSelect={(k) => set({ kind: k })} />
+          <Segmented
+            options={KINDS.map((k) => ({ value: k, label: S.kind[k] }))}
+            selected={f.kind}
+            onSelect={(k) => set({ kind: k })}
+          />
         </div>
         {!articleId && <p className="text-sm text-muted">{S.articleReviewNote}</p>}
         <SwitchRow label={S.published} checked={f.published} onChange={(v) => set({ published: v })} />
-        <TextArea label={S.articleBody} rows={10} value={f.body} onChange={(e) => set({ body: e.target.value })} error={errors.body} />
+        <TextArea
+          label={S.articleBody}
+          rows={10}
+          value={f.body}
+          onChange={(e) => set({ body: e.target.value })}
+          error={errors.body}
+        />
       </FormPage>
 
       {reviewDialog && (

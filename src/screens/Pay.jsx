@@ -6,7 +6,15 @@ import { egp } from "../lib/format.js";
 import { S } from "../lib/strings.js";
 import Icon from "../components/Icon.jsx";
 import { toast } from "../components/Toast.jsx";
-import { AlertBox, ErrorBanner, FormField, GoldButton, MessageBox, ScreenTitle, SkeletonRows } from "../components/ui.jsx";
+import {
+  AlertBox,
+  ErrorBanner,
+  FormField,
+  GoldButton,
+  MessageBox,
+  ScreenTitle,
+  SkeletonRows,
+} from "../components/ui.jsx";
 
 /** "إتمام الدفع": plan summary, InstaPay / Vodafone Cash account, transfer reference → request for review. */
 export default function Pay() {
@@ -76,7 +84,9 @@ export default function Pay() {
                 <div className="flex items-center gap-2">
                   <Icon name={pm.key === "instapay" ? "bank" : "phoneAndroid"} size={20} className="text-goldInk" />
                   <span className="flex-1 font-bold">{pm.name}</span>
-                  <span className={`w-5 h-5 rounded-full border-2 grid place-items-center ${on ? "border-goldInk" : "border-muted"}`}>
+                  <span
+                    className={`w-5 h-5 rounded-full border-2 grid place-items-center ${on ? "border-goldInk" : "border-muted"}`}
+                  >
                     {on && <span className="w-2.5 h-2.5 rounded-full bg-goldInk" />}
                   </span>
                 </div>
@@ -131,7 +141,13 @@ export default function Pay() {
           <p className="text-center text-xs text-muted">{S.payActivationNote}</p>
         </div>
       )}
-      {done && <AlertBox title={S.paymentSentTitle} body={S.paymentSentBody} onClose={() => nav("/payments", { replace: true })} />}
+      {done && (
+        <AlertBox
+          title={S.paymentSentTitle}
+          body={S.paymentSentBody}
+          onClose={() => nav("/payments", { replace: true })}
+        />
+      )}
     </div>
   );
 }

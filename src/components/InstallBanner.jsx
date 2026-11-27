@@ -8,8 +8,7 @@ import { S } from "../lib/strings.js";
 const ua = navigator.userAgent;
 export const isIos = /iPhone|iPad|iPod/.test(ua) || (ua.includes("Macintosh") && navigator.maxTouchPoints > 1);
 const isIosSafari = isIos && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-export const isStandalone = () =>
-  matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+export const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 
 const DISMISS_KEY = "aghour.installDismissedAt";
 const recentlyDismissed = () => Date.now() - Number(localStorage.getItem(DISMISS_KEY) || 0) < 7 * 864e5;
@@ -89,5 +88,7 @@ export default function InstallBanner({ force = false }) {
 }
 
 const Step = ({ n }) => (
-  <span className="w-6 h-6 rounded-full bg-gold text-black text-xs font-bold grid place-items-center shrink-0">{n}</span>
+  <span className="w-6 h-6 rounded-full bg-gold text-black text-xs font-bold grid place-items-center shrink-0">
+    {n}
+  </span>
 );
