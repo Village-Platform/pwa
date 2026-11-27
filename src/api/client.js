@@ -2,7 +2,7 @@ import { session } from "../lib/session.js";
 import { S } from "../lib/strings.js";
 
 // Must end with /api/v1/ (same contract as the Android app's API_BASE_URL).
-export const API_BASE = import.meta.env.API_URL || "https://aghour.dorfsys.com/api/v1/";
+export const API_BASE = import.meta.env.VITE_API_URL || "https://aghour.dorfsys.com/api/v1/";
 
 /** Category icon_url etc. are relative to the API host. */
 export const assetUrl = (rel) => (rel ? new URL(rel, API_BASE).toString() : null);
