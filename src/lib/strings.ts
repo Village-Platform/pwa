@@ -247,6 +247,7 @@ export const S = {
   },
   currency: "ج.م",
 
+  notAllowed: "ليس لديك صلاحية لفتح هذه الصفحة.",
   // Profile
   editProfile: "تعديل الملف الشخصي",
   currentPassword: "كلمة المرور الحالية",
@@ -256,6 +257,23 @@ export const S = {
   myArticles: "مقالاتي",
   noMyArticles: "لم تنشر أي مقال بعد.",
   reviewStatus: { approved: "منشور", pending: "قيد المراجعة", rejected: "مرفوض" },
+  // Review (reviewers)
+  reviewQueue: "طلبات المراجعة",
+  reviewFirmsTab: "الأنشطة",
+  reviewArticlesTab: "المقالات",
+  noPendingFirms: "لا توجد أنشطة بانتظار المراجعة.",
+  noPendingArticles: "لا توجد مقالات بانتظار المراجعة.",
+  reject: "رفض",
+  rejectReason: "سبب الرفض",
+  rejectReasonRequired: "اكتب سبب الرفض.",
+  rejectFirmTitle: "رفض النشاط",
+  rejectArticleTitle: "رفض المقال",
+  firmApproved: "تم قبول النشاط.",
+  firmRejected: "تم رفض النشاط.",
+  articleApproved: "تم قبول المقال.",
+  articleRejected: "تم رفض المقال.",
+  reviewFirmTitle: "مراجعة النشاط",
+  reviewArticle: "مراجعة المقال",
   // Topics
   notificationSettings: "إعدادات الإشعارات",
   topicsTitle: "المواضيع",
