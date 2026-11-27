@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "../components/Toast.jsx";
 import { S } from "./strings";
-import type { Page } from "../api/types";
+import type { Page, PageMeta } from "../api/types";
 
 type DepList = readonly unknown[];
 
@@ -56,12 +56,22 @@ export interface PagedState<T> {
   page: number;
   totalPages: number;
   total: number;
+  /** The latest page's meta, e.g. unread_count for notifications. */
+  meta: PageMeta | null;
   loading: boolean;
   error: Error | null;
 }
 
 export function usePaged<T>(fetchPage: (page: number) => Promise<Page<T>>, deps: DepList = []) {
-  const empty: PagedState<T> = { items: [], page: 0, totalPages: 1, total: 0, loading: true, error: null };
+  const empty: PagedState<T> = {
+    items: [],
+    page: 0,
+    totalPages: 1,
+    total: 0,
+    meta: null,
+    loading: true,
+    error: null,
+  };
   const [s, setS] = useState<PagedState<T>>(empty);
   const gen = useRef(0);
 
@@ -76,6 +86,7 @@ export function usePaged<T>(fetchPage: (page: number) => Promise<Page<T>>, deps:
             page,
             totalPages: res.meta?.total_pages ?? 1,
             total: res.meta?.total ?? res.data.length,
+            meta: res.meta ?? null,
             loading: false,
             error: null,
           }));
@@ -90,7 +101,7 @@ export function usePaged<T>(fetchPage: (page: number) => Promise<Page<T>>, deps:
 
   useEffect(() => {
     const g = ++gen.current;
-    setS({ items: [], page: 0, totalPages: 1, total: 0, loading: true, error: null });
+    setS({ items: [], page: 0, totalPages: 1, total: 0, meta: null, loading: true, error: null });
     load(1, g);
   }, [load]);
 

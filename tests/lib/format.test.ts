@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   egp,
   formatDate,
+  notificationAction,
   normalizeDigits,
   parseCoordinates,
   relativeTime,
@@ -9,6 +10,7 @@ import {
   validPhone,
   whatsappUrl,
 } from "@/lib/format";
+import type { AppNotification } from "@/api/types";
 
 describe("relativeTime", () => {
   const NOW = new Date("2026-11-27T12:00:00Z");
@@ -83,5 +85,33 @@ describe("Arabic digits and coordinates", () => {
     expect(parseCoordinates("٣٠٫٣٦, ٣١٫٢١")).toEqual({ lat: 30.36, lng: 31.21 });
     expect(() => parseCoordinates("100% 30.36,31.21")).not.toThrow();
     expect(parseCoordinates("100% 30.36,31.21")).toEqual({ lat: 30.36, lng: 31.21 });
+  });
+});
+
+describe("notificationAction", () => {
+  const n = (data: AppNotification["data"], kind = ""): AppNotification => ({
+    id: 1,
+    kind,
+    title: "",
+    body: "",
+    read: false,
+    read_at: null,
+    created_at: "",
+    data,
+  });
+
+  it("routes known screens", () => {
+    expect(notificationAction(n({ screen: "firm", id: "12" }), { plansOn: true })).toBe("/firms/12");
+    expect(notificationAction(n({ screen: "article", id: "5" }), { plansOn: true })).toBe("/news/5");
+    expect(notificationAction(n({ screen: "category", id: "3" }), { plansOn: true })).toBe("/explore?category=3");
+  });
+
+  it("opens the inbox for a screen it does not know", () => {
+    expect(notificationAction(n({ screen: "something_new", id: "1" }), { plansOn: true })).toBe("/notifications");
+    expect(notificationAction(n({ screen: "toString" }), { plansOn: true })).toBe("/notifications");
+  });
+
+  it("drops plan targets while the plans feature is off", () => {
+    expect(notificationAction(n({ screen: "subscription" }), { plansOn: false })).toBeNull();
   });
 });

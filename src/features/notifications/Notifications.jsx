@@ -9,6 +9,7 @@ import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
 import PullToRefresh from "../../components/PullToRefresh.jsx";
 import PagedList from "../../components/PagedList.jsx";
+import { toast } from "../../components/Toast.jsx";
 import { FilterChipsRow, ScreenTitle } from "../../components/ui.jsx";
 
 // Signed in: the user's inbox. Guest: this install's broadcast inbox (X-Installation-Id). The
@@ -29,17 +30,29 @@ function Inbox() {
   const list = usePaged((page) => Api.notifications({ page, unread: unreadOnly }), [unreadOnly]);
 
   const isRead = (n) => n.read || allRead || readIds.has(n.id);
-  const unreadCount = list.items.filter((n) => !isRead(n)).length;
+  // The server's count covers the whole inbox, not just the rows loaded so far. Rows read in this
+  // session are taken off it until the next refresh.
+  const readHere = list.items.filter((n) => !n.read && isRead(n)).length;
+  const serverUnread = list.meta?.unread_count ?? list.items.filter((n) => !n.read).length;
+  const unreadCount = allRead ? 0 : Math.max(0, serverUnread - readHere);
   const visible = list.items;
 
-  // Optimistic: shown as read right away, then the server is told (same as Android).
+  // Optimistic: shown as read right away, then the server is told (same as Android). If the server
+  // refuses, the row goes back to unread and the user is told.
   const open = (n) => {
     if (!isRead(n)) {
       setReadIds((s) => new Set(s).add(n.id));
-      Api.readNotification(n.id).catch(() => {});
+      Api.readNotification(n.id).catch(() => {
+        setReadIds((s) => {
+          const next = new Set(s);
+          next.delete(n.id);
+          return next;
+        });
+        toast(S.markReadFailed);
+      });
     }
     const to = notificationAction(n, { plansOn });
-    if (to) nav(to);
+    if (to && to !== "/notifications") nav(to);
   };
 
   return (
@@ -52,7 +65,10 @@ function Inbox() {
               className="text-sm font-bold text-goldInk px-2"
               onClick={() => {
                 setAllRead(true);
-                Api.readAllNotifications().catch(() => {});
+                Api.readAllNotifications().catch(() => {
+                  setAllRead(false);
+                  toast(S.markReadFailed);
+                });
               }}
             >
               {S.markAllRead}

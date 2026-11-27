@@ -118,7 +118,8 @@ export function notificationAction(n: AppNotification, { plansOn }: { plansOn: b
       category: id ? `/explore?category=${id}` : null,
       subscription: "/payments",
     };
-    to = targets[screen] ?? null;
+    // A screen this app does not know yet opens the inbox (the contract that keeps old apps safe).
+    to = Object.hasOwn(targets, screen) ? targets[screen] : "/notifications";
   } else if (n.kind) {
     const k = n.kind;
     if (k.includes("expir") || k.includes("renew")) to = "/plans";

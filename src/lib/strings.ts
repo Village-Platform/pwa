@@ -66,6 +66,7 @@ export const S = {
   notifications: "الإشعارات",
   noNotifications: "لا توجد إشعارات.",
   markAllRead: "تحديد الكل كمقروء",
+  markReadFailed: "تعذّر تحديث حالة الإشعار. حاول مرة أخرى.",
   unread: "غير مقروء",
   settings: "الإعدادات",
   appearance: "المظهر",
