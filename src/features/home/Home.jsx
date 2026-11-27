@@ -1,14 +1,13 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { useLoad } from "../lib/hooks.js";
-import { useSession } from "../lib/session.js";
-import { useFeatures } from "../lib/features.js";
-import { greeting, relativeTime } from "../lib/format.js";
-import { S } from "../lib/strings.js";
-import Icon from "../components/Icon.jsx";
-import InstallBanner from "../components/InstallBanner.jsx";
-import PullToRefresh from "../components/PullToRefresh.jsx";
+import { Api } from "../../api/endpoints";
+import { useLoad } from "../../lib/hooks";
+import { useSession } from "../../lib/session";
+import { useFlag } from "../../lib/features";
+import { greeting, relativeTime } from "../../lib/format";
+import { S } from "../../lib/strings";
+import Icon from "../../components/Icon.jsx";
+import InstallBanner from "../../components/InstallBanner.jsx";
+import PullToRefresh from "../../components/PullToRefresh.jsx";
 import {
   BrandMark,
   ErrorBanner,
@@ -18,36 +17,29 @@ import {
   SearchPill,
   SectionHeader,
   SkeletonRows,
-} from "../components/ui.jsx";
-import { asset } from "../lib/asset.js";
+} from "../../components/ui.jsx";
+import { asset } from "../../lib/asset";
 
 export default function Home() {
   const nav = useNavigate();
   const { user } = useSession();
-  const { plans: plansOn } = useFeatures();
-  const [tick, setTick] = useState(0);
+  const plansOn = useFlag("plans");
 
-  const cats = useLoad(() => Api.categories().then((r) => r.data), [tick]);
+  const cats = useLoad(() => Api.categories().then((r) => r.data));
   // Featured firms and news are bonus sections: the page still works if they fail.
-  const firms = useLoad(() => Api.firms({ perPage: 4 }).then((r) => r.data), [tick]);
-  const news = useLoad(() => Api.articles({ perPage: 3 }).then((r) => r.data), [tick]);
+  const firms = useLoad(() => Api.firms({ perPage: 4 }).then((r) => r.data));
+  const news = useLoad(() => Api.articles({ perPage: 3 }).then((r) => r.data));
   // The bell is shown to guests too: their install has its own broadcast inbox.
-  const unread = useLoad(
-    () => Api.notifications({ perPage: 1 }).then((r) => r.meta?.unread_count ?? 0),
-    [tick, user?.id],
-  );
+  const unread = useLoad(() => Api.notifications({ perPage: 1 }).then((r) => r.meta?.unread_count ?? 0), [user?.id]);
+
+  const refreshAll = () => Promise.all([cats.reload(), firms.reload(), news.reload(), unread.reload()]);
 
   // Signed in → add a firm directly (the server answers if the plan does not allow it);
   // guests → the plans when they are on; otherwise the banner is only artwork.
   const onAddFirm = user ? () => nav("/firms/new") : plansOn ? () => nav("/plans") : null;
 
   return (
-    <PullToRefresh
-      onRefresh={() => {
-        setTick((t) => t + 1);
-        return new Promise((r) => setTimeout(r, 700));
-      }}
-    >
+    <PullToRefresh onRefresh={refreshAll}>
       <div className="pb-6 pt-safe">
         <div className="px-5 pt-3">
           <div className="flex items-center gap-2">
@@ -77,7 +69,7 @@ export default function Home() {
         <InstallBanner />
 
         <div className="mt-4">
-          <ErrorBanner error={!cats.data && cats.error} onRetry={() => setTick((t) => t + 1)} />
+          <ErrorBanner error={!cats.data && cats.error} onRetry={cats.reload} />
           {cats.loading && !cats.data ? (
             <div className="flex gap-3 px-4">
               {Array.from({ length: 5 }, (_, i) => (

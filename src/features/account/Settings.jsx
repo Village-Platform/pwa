@@ -1,6 +1,6 @@
-import { useTheme } from "../lib/theme.js";
-import { S } from "../lib/strings.js";
-import { ScreenTitle, SurfaceCard } from "../components/ui.jsx";
+import { useTheme } from "../../lib/theme";
+import { S } from "../../lib/strings";
+import { ScreenTitle, SurfaceCard } from "../../components/ui.jsx";
 
 const OPTIONS = [
   { value: "light", label: S.themeLight },

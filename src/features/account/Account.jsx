@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { session, useSession } from "../lib/session.js";
-import { useFeatures } from "../lib/features.js";
-import { S } from "../lib/strings.js";
-import Icon from "../components/Icon.jsx";
-import InstallBanner from "../components/InstallBanner.jsx";
+import { Api } from "../../api/endpoints";
+import { useLoad } from "../../lib/hooks";
+import { session, useSession } from "../../lib/session";
+import { useFlag } from "../../lib/features";
+import { S } from "../../lib/strings";
+import Icon from "../../components/Icon.jsx";
+import InstallBanner from "../../components/InstallBanner.jsx";
 import {
   AlertBox,
   Badge,
@@ -17,7 +18,7 @@ import {
   GoldButton,
   LetterAvatar,
   SurfaceCard,
-} from "../components/ui.jsx";
+} from "../../components/ui.jsx";
 
 const PLAY_URL = "https://play.google.com/store/apps/details?id=com.aghourservices";
 const VERSION = import.meta.env.VITE_APP_VERSION || "web";
@@ -72,17 +73,16 @@ function GuestProfile({ onAbout }) {
 
 function Profile({ user, onAbout }) {
   const nav = useNavigate();
-  const { plans: plansOn } = useFeatures();
+  const plansOn = useFlag("plans");
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const [data, setData] = useState({ firms: [], current: null, pending: null });
 
   // Each time the profile is shown: role / subscription / firms may have changed on the server.
-  useEffect(() => {
-    let alive = true;
+  // Failures leave the counts at zero rather than blocking the screen.
+  const { data: loaded } = useLoad(async () => {
     Api.me()
-      .then((r) => alive && session.setUser(r.data))
+      .then((r) => session.setUser(r.data))
       .catch(() => {});
-    Promise.all([
+    const [firms, subs] = await Promise.all([
       Api.myFirms({ perPage: 50 })
         .then((r) => r.data)
         .catch(() => []),
@@ -90,19 +90,15 @@ function Profile({ user, onAbout }) {
         ? Api.subscriptions({ perPage: 50 })
             .then((r) => r.data)
             .catch(() => [])
-        : Promise.resolve([]),
-    ]).then(([firms, subs]) => {
-      if (!alive) return;
-      setData({
-        firms,
-        current: subs.find((s) => s.state === "current") || null,
-        pending: subs.find((s) => s.state === "pending") || null,
-      });
-    });
-    return () => {
-      alive = false;
+        : [],
+    ]);
+    return {
+      firms,
+      current: subs.find((s) => s.state === "current") || null,
+      pending: subs.find((s) => s.state === "pending") || null,
     };
   }, [user.id, plansOn]);
+  const data = loaded ?? { firms: [], current: null, pending: null };
 
   return (
     <>

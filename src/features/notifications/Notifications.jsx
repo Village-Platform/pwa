@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { useOnVisible, usePaged } from "../lib/hooks.js";
-import { useSession } from "../lib/session.js";
-import { useFeatures } from "../lib/features.js";
-import { notificationAction, notificationIcon, relativeTime } from "../lib/format.js";
-import { S } from "../lib/strings.js";
-import Icon from "../components/Icon.jsx";
-import PullToRefresh from "../components/PullToRefresh.jsx";
-import { ErrorBanner, FilterChipsRow, MessageBox, ScreenTitle, SkeletonRows } from "../components/ui.jsx";
+import { Api } from "../../api/endpoints";
+import { usePaged } from "../../lib/hooks";
+import { useSession } from "../../lib/session";
+import { useFlag } from "../../lib/features";
+import { notificationAction, notificationIcon, relativeTime } from "../../lib/format";
+import { S } from "../../lib/strings";
+import Icon from "../../components/Icon.jsx";
+import PullToRefresh from "../../components/PullToRefresh.jsx";
+import PagedList from "../../components/PagedList.jsx";
+import { FilterChipsRow, ScreenTitle } from "../../components/ui.jsx";
 
 // Signed in: the user's inbox. Guest: this install's broadcast inbox (X-Installation-Id). The
 // server fills a guest inbox only for installs it knows, i.e. after web push registers the device.
@@ -19,12 +20,11 @@ export default function Notifications() {
 
 function Inbox() {
   const nav = useNavigate();
-  const { plans: plansOn } = useFeatures();
+  const plansOn = useFlag("plans");
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [readIds, setReadIds] = useState(() => new Set());
   const [allRead, setAllRead] = useState(false);
   const list = usePaged((page) => Api.notifications({ page }), []);
-  const sentinel = useOnVisible(() => list.loadMore());
 
   const isRead = (n) => n.read || allRead || readIds.has(n.id);
   const unreadCount = list.items.filter((n) => !isRead(n)).length;
@@ -62,8 +62,7 @@ function Inbox() {
         onRefresh={() => {
           setReadIds(new Set());
           setAllRead(false);
-          list.refresh();
-          return new Promise((r) => setTimeout(r, 700));
+          return list.refresh();
         }}
       >
         {list.items.length > 0 && (
@@ -76,8 +75,12 @@ function Inbox() {
             onSelect={setUnreadOnly}
           />
         )}
-        <div className="px-4 space-y-2">
-          {visible.map((n) => {
+        <PagedList
+          list={list}
+          items={visible}
+          skeletons={[4, 1]}
+          empty={S.noNotifications}
+          renderItem={(n) => {
             const read = isRead(n);
             return (
               <button
@@ -100,12 +103,8 @@ function Inbox() {
                 </div>
               </button>
             );
-          })}
-        </div>
-        {list.loading && <SkeletonRows count={list.items.length ? 1 : 4} />}
-        <ErrorBanner error={list.error} onRetry={list.retry} />
-        {!list.loading && !list.error && visible.length === 0 && <MessageBox text={S.noNotifications} />}
-        <div ref={sentinel} className="h-1" />
+          }}
+        />
       </PullToRefresh>
     </div>
   );

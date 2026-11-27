@@ -1,44 +1,41 @@
 import { useState } from "react";
 import { flushSync } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { session } from "../lib/session.js";
-import { S } from "../lib/strings.js";
-import { toast } from "../components/Toast.jsx";
-import { DangerButton, Dialog, ErrorBanner, FormField, FormPage, ScreenTitle } from "../components/ui.jsx";
+import { Api } from "../../api/endpoints";
+import { useForm } from "../../lib/useForm";
+import { session } from "../../lib/session";
+import { S } from "../../lib/strings";
+import { toast } from "../../components/Toast.jsx";
+import { DangerButton, Dialog, ErrorBanner, FormField, FormPage, ScreenTitle } from "../../components/ui.jsx";
 
 export function ChangePassword() {
   const nav = useNavigate();
-  const [f, setF] = useState({ password: "", confirmation: "" });
-  const [errors, setErrors] = useState({});
-  const [submit, setSubmit] = useState({ busy: false, error: null });
-
-  const save = async () => {
-    const errs = {};
-    if (f.password.length < 8) errs.password = S.errorPasswordShort;
-    if (f.password !== f.confirmation) errs.confirmation = S.errorPasswordMismatch;
-    setErrors(errs);
-    if (Object.keys(errs).length) return;
-    setSubmit({ busy: true, error: null });
-    try {
-      const res = await Api.changePassword(f.password, f.confirmation);
+  const form = useForm({
+    initial: { password: "", confirmation: "" },
+    validate: (f) => {
+      const errs = {};
+      if (f.password.length < 8) errs.password = S.errorPasswordShort;
+      if (f.password !== f.confirmation) errs.confirmation = S.errorPasswordMismatch;
+      return errs;
+    },
+    submit: (f) => Api.changePassword(f.password, f.confirmation),
+    onSuccess: (res) => {
       // The server revokes every older token on a password change and returns a fresh one.
       if (res?.meta?.token) session.signIn({ token: res.meta.token, user: res.data ?? session.get().user });
       toast(S.passwordChanged);
       nav(-1);
-    } catch (error) {
-      setSubmit({ busy: false, error });
-    }
-  };
+    },
+  });
+  const { values: f, set, errors } = form;
 
   return (
-    <FormPage title={S.changePassword} error={submit.error} submitting={submit.busy} onSave={save}>
+    <FormPage title={S.changePassword} error={form.error} submitting={form.busy} onSave={form.save}>
       <FormField
         label={S.newPassword}
         type="password"
         autoComplete="new-password"
         value={f.password}
-        onChange={(e) => setF({ ...f, password: e.target.value })}
+        onChange={(e) => set({ password: e.target.value })}
         error={errors.password}
       />
       <FormField
@@ -46,7 +43,7 @@ export function ChangePassword() {
         type="password"
         autoComplete="new-password"
         value={f.confirmation}
-        onChange={(e) => setF({ ...f, confirmation: e.target.value })}
+        onChange={(e) => set({ confirmation: e.target.value })}
         error={errors.confirmation}
       />
     </FormPage>

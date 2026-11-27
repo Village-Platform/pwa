@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { useLoad } from "../lib/hooks.js";
-import { egp } from "../lib/format.js";
-import { S } from "../lib/strings.js";
-import Icon from "../components/Icon.jsx";
-import { toast } from "../components/Toast.jsx";
+import { Api } from "../../api/endpoints";
+import { useLoad } from "../../lib/hooks";
+import { egp } from "../../lib/format";
+import { S } from "../../lib/strings";
+import Icon from "../../components/Icon.jsx";
+import { toast } from "../../components/Toast.jsx";
 import {
   AlertBox,
   ErrorBanner,
@@ -14,7 +14,7 @@ import {
   MessageBox,
   ScreenTitle,
   SkeletonRows,
-} from "../components/ui.jsx";
+} from "../../components/ui.jsx";
 
 /** "إتمام الدفع": plan summary, InstaPay / Vodafone Cash account, transfer reference → request for review. */
 export default function Pay() {
@@ -68,51 +68,56 @@ export default function Pay() {
           <div className="flex items-center rounded-2xl bg-gold/15 border border-gold/40 p-4">
             <div className="flex-1">
               <p className="text-xs text-goldInk">{S.planLabel}</p>
-              <p className="font-bold">{`${plan.name} · ${plan.duration_days} يوم`}</p>
+              <p className="font-bold">{`${plan.name} · ${plan.duration_days} ${S.daysUnit}`}</p>
             </div>
             <p className="text-2xl font-black">{egp(plan.price_cents)}</p>
           </div>
 
-          {data.methods.map((pm) => {
-            const on = pm.key === selected;
-            return (
-              <div
-                key={pm.key}
-                onClick={() => setMethod(pm.key)}
-                className={`rounded-2xl bg-surface p-3 cursor-pointer ${on ? "border-2 border-gold" : "border border-line"}`}
-              >
-                <div className="flex items-center gap-2">
-                  <Icon name={pm.key === "instapay" ? "bank" : "phoneAndroid"} size={20} className="text-goldInk" />
-                  <span className="flex-1 font-bold">{pm.name}</span>
-                  <span
-                    className={`w-5 h-5 rounded-full border-2 grid place-items-center ${on ? "border-goldInk" : "border-muted"}`}
+          <div role="radiogroup" aria-label={S.paymentMethodLabel} className="space-y-3">
+            {data.methods.map((pm) => {
+              const on = pm.key === selected;
+              return (
+                <div
+                  key={pm.key}
+                  className={`rounded-2xl bg-surface p-3 ${on ? "border-2 border-gold" : "border border-line"}`}
+                >
+                  {/* A real button, so the card works with the keyboard and screen readers. */}
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => setMethod(pm.key)}
+                    className="w-full flex items-center gap-2 text-start"
                   >
-                    {on && <span className="w-2.5 h-2.5 rounded-full bg-goldInk" />}
-                  </span>
-                </div>
-                {on && pm.account && (
-                  <div className="mt-2 rounded-[10px] bg-surface2 p-2.5 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="flex-1 font-bold">
-                        {S.transferTo} <span dir="ltr">{pm.account}</span>
-                      </span>
-                      <button
-                        type="button"
-                        className="font-bold text-goldInk px-2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigator.clipboard?.writeText(pm.account).then(() => toast(S.copied));
-                        }}
-                      >
-                        {S.copy}
-                      </button>
+                    <Icon name={pm.key === "instapay" ? "bank" : "phoneAndroid"} size={20} className="text-goldInk" />
+                    <span className="flex-1 font-bold">{pm.name}</span>
+                    <span
+                      className={`w-5 h-5 rounded-full border-2 grid place-items-center ${on ? "border-goldInk" : "border-muted"}`}
+                    >
+                      {on && <span className="w-2.5 h-2.5 rounded-full bg-goldInk" />}
+                    </span>
+                  </button>
+                  {on && pm.account && (
+                    <div className="mt-2 rounded-[10px] bg-surface2 p-2.5 text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="flex-1 font-bold">
+                          {S.transferTo} <span dir="ltr">{pm.account}</span>
+                        </span>
+                        <button
+                          type="button"
+                          className="font-bold text-goldInk px-2"
+                          onClick={() => navigator.clipboard?.writeText(pm.account).then(() => toast(S.copied))}
+                        >
+                          {S.copy}
+                        </button>
+                      </div>
+                      <p>{S.amount(egp(plan.price_cents))}</p>
                     </div>
-                    <p>{S.amount(egp(plan.price_cents))}</p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
           <FormField
             label={S.transferReference}
@@ -127,7 +132,7 @@ export default function Pay() {
           />
           <FormField
             label={S.payerPhone}
-            placeholder="01X XXXX XXXX"
+            placeholder={S.phonePlaceholder}
             type="tel"
             inputMode="numeric"
             dir="ltr"

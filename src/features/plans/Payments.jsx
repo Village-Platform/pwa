@@ -1,17 +1,21 @@
-import { Api } from "../api/endpoints.js";
-import { useOnVisible, usePaged } from "../lib/hooks.js";
-import { egp, formatDate, subscriptionTone } from "../lib/format.js";
-import { S } from "../lib/strings.js";
-import { Badge, ErrorBanner, MessageBox, ScreenTitle, SkeletonRows, SurfaceCard } from "../components/ui.jsx";
+import { Api } from "../../api/endpoints";
+import { usePaged } from "../../lib/hooks";
+import { egp, formatDate, subscriptionTone } from "../../lib/format";
+import { S } from "../../lib/strings";
+import PagedList from "../../components/PagedList.jsx";
+import { Badge, ScreenTitle, SurfaceCard } from "../../components/ui.jsx";
 
 export default function Payments() {
   const list = usePaged((page) => Api.subscriptions({ page }), []);
-  const sentinel = useOnVisible(() => list.loadMore());
   return (
     <div className="pb-6">
       <ScreenTitle title={S.paymentsHistory} />
-      <div className="p-4 space-y-2.5">
-        {list.items.map((s) => (
+      <PagedList
+        list={list}
+        skeletons={[3, 1]}
+        empty={S.noPayments}
+        className="p-4 space-y-2.5"
+        renderItem={(s) => (
           <SurfaceCard key={s.id} className="p-4 space-y-1">
             <div className="flex items-center gap-2">
               <p className="font-bold flex-1">{s.plan.name}</p>
@@ -27,12 +31,8 @@ export default function Payments() {
             </p>
             {s.rejection_reason && <p className="text-sm text-bad">{s.rejection_reason}</p>}
           </SurfaceCard>
-        ))}
-      </div>
-      {list.loading && <SkeletonRows count={list.items.length ? 1 : 3} />}
-      <ErrorBanner error={list.error} onRetry={list.retry} />
-      {!list.loading && !list.error && list.items.length === 0 && <MessageBox text={S.noPayments} />}
-      <div ref={sentinel} className="h-1" />
+        )}
+      />
     </div>
   );
 }

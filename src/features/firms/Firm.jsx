@@ -1,14 +1,22 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { useLoad } from "../lib/hooks.js";
-import { useSession } from "../lib/session.js";
-import { firmStatusTone, mapUrl, whatsappUrl } from "../lib/format.js";
-import { S } from "../lib/strings.js";
-import Icon from "../components/Icon.jsx";
-import { toast } from "../components/Toast.jsx";
-import { Badge, DangerButton, Dialog, ErrorBanner, GhostButton, ScreenTitle, SkeletonRows } from "../components/ui.jsx";
-import { asset } from "../lib/asset.js";
+import { Api } from "../../api/endpoints";
+import { useLoad, useShare } from "../../lib/hooks";
+import { useSession } from "../../lib/session";
+import { firmStatusTone, mapUrl, whatsappUrl } from "../../lib/format";
+import { S } from "../../lib/strings";
+import Icon from "../../components/Icon.jsx";
+import { toast } from "../../components/Toast.jsx";
+import {
+  Badge,
+  DangerButton,
+  Dialog,
+  ErrorBanner,
+  GhostButton,
+  ScreenTitle,
+  SkeletonRows,
+} from "../../components/ui.jsx";
+import { asset } from "../../lib/asset";
 
 /**
  * Which controls to show. The server sends them in `can` (its FirmPolicy); without it, the same
@@ -30,6 +38,7 @@ export default function Firm() {
   const nav = useNavigate();
   const { user } = useSession();
   const { data: loaded, error, loading, reload } = useLoad(() => Api.firm(id).then((r) => r.data), [id, user?.id]);
+  const shareFirm = useShare();
   const [override, setOverride] = useState(null); // firm after approve / suspend
   const firm = override?.id === loaded?.id ? override : loaded;
 
@@ -42,11 +51,8 @@ export default function Firm() {
     );
   }
 
-  const share = () => {
-    const text = [firm.name, firm.address, firm.phone].filter(Boolean).join("\n");
-    if (navigator.share) navigator.share({ title: firm.name, text, url: location.href }).catch(() => {});
-    else navigator.clipboard?.writeText(`${text}\n${location.href}`).then(() => toast(S.copied));
-  };
+  const share = () =>
+    shareFirm({ title: firm.name, text: [firm.name, firm.address, firm.phone].filter(Boolean).join("\n") });
   const phone = firm.phone?.trim() || null;
   const wa = firm.whatsapp?.trim() || phone;
   const hasCoords = firm.latitude != null && firm.longitude != null;

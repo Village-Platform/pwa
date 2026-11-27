@@ -1,10 +1,16 @@
-import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { session } from "../lib/session.js";
-import { validPhone } from "../lib/format.js";
-import { S } from "../lib/strings.js";
-import { BrandMark, ErrorBanner, FormField, GoldButton, ScreenTitle } from "../components/ui.jsx";
+import { Api } from "../../api/endpoints";
+import { useForm } from "../../lib/useForm";
+import { session } from "../../lib/session";
+import { validPhone } from "../../lib/format";
+import { S } from "../../lib/strings";
+import { BrandMark, ErrorBanner, FormField, GoldButton, ScreenTitle } from "../../components/ui.jsx";
+
+// <form onSubmit> handler for a useForm form.
+const onSubmit = (form) => (e) => {
+  e.preventDefault();
+  form.save();
+};
 
 // Login and Register return to the screen that asked for them (location.state.from), like Android.
 function useFinish() {
@@ -19,34 +25,23 @@ function useFinish() {
 export function Login() {
   const finish = useFinish();
   const location = useLocation();
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
-  const [busy, setBusy] = useState(false);
-  const [apiError, setApiError] = useState(null);
-
-  const submit = async (e) => {
-    e.preventDefault();
-    const errs = {};
-    if (!validPhone(phone)) errs.phone = S.errorPhoneInvalid;
-    if (!password) errs.password = S.errorPasswordRequired;
-    setErrors(errs);
-    if (Object.keys(errs).length) return;
-    setBusy(true);
-    setApiError(null);
-    try {
-      finish(await Api.login(phone.trim(), password));
-    } catch (err) {
-      setApiError(err);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const form = useForm({
+    initial: { phone: "", password: "" },
+    validate: (v) => {
+      const errs = {};
+      if (!validPhone(v.phone)) errs.phone = S.errorPhoneInvalid;
+      if (!v.password) errs.password = S.errorPasswordRequired;
+      return errs;
+    },
+    submit: (v) => Api.login(v.phone.trim(), v.password),
+    onSuccess: finish,
+  });
+  const { values: f, set, errors } = form;
 
   return (
     <div className="pb-8">
       <ScreenTitle title={S.login} />
-      <form onSubmit={submit} className="px-4 pt-6 space-y-4 max-w-md mx-auto" noValidate>
+      <form onSubmit={onSubmit(form)} className="px-4 pt-6 space-y-4 max-w-md mx-auto" noValidate>
         <div className="flex flex-col items-center gap-2 mb-2">
           <BrandMark className="h-16" />
           <h2 className="text-2xl font-extrabold">{S.loginTitle}</h2>
@@ -58,21 +53,21 @@ export function Login() {
           inputMode="numeric"
           autoComplete="tel"
           dir="ltr"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+          value={f.phone}
+          onChange={(e) => set({ phone: e.target.value })}
           error={errors.phone}
         />
         <FormField
           label={S.password}
           type="password"
           autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={f.password}
+          onChange={(e) => set({ password: e.target.value })}
           error={errors.password}
         />
-        <ErrorBanner error={apiError} />
-        <GoldButton type="submit" disabled={busy} className="w-full">
-          {busy ? S.loading : S.login}
+        <ErrorBanner error={form.error} />
+        <GoldButton type="submit" disabled={form.busy} className="w-full">
+          {form.busy ? S.loading : S.login}
         </GoldButton>
         <p className="text-center text-sm">
           {S.noAccountQ}{" "}
@@ -88,38 +83,27 @@ export function Login() {
 export function Register() {
   const finish = useFinish();
   const location = useLocation();
-  const [f, setF] = useState({ name: "", phone: "", email: "", password: "", password_confirmation: "" });
-  const [errors, setErrors] = useState({});
-  const [busy, setBusy] = useState(false);
-  const [apiError, setApiError] = useState(null);
-  const bind = (k) => ({ value: f[k], onChange: (e) => setF({ ...f, [k]: e.target.value }), error: errors[k] });
-
-  const submit = async (e) => {
-    e.preventDefault();
-    const errs = {};
-    if (!f.name.trim()) errs.name = S.errorNameRequired;
-    if (!validPhone(f.phone)) errs.phone = S.errorPhoneInvalid;
-    if (f.password.length < 8) errs.password = S.errorPasswordShort;
-    if (f.password !== f.password_confirmation) errs.password_confirmation = S.errorPasswordMismatch;
-    setErrors(errs);
-    if (Object.keys(errs).length) return;
-    setBusy(true);
-    setApiError(null);
-    try {
-      finish(
-        await Api.register({ ...f, name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() || undefined }),
-      );
-    } catch (err) {
-      setApiError(err);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const form = useForm({
+    initial: { name: "", phone: "", email: "", password: "", password_confirmation: "" },
+    validate: (f) => {
+      const errs = {};
+      if (!f.name.trim()) errs.name = S.errorNameRequired;
+      if (!validPhone(f.phone)) errs.phone = S.errorPhoneInvalid;
+      if (f.password.length < 8) errs.password = S.errorPasswordShort;
+      if (f.password !== f.password_confirmation) errs.password_confirmation = S.errorPasswordMismatch;
+      return errs;
+    },
+    submit: (f) =>
+      Api.register({ ...f, name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() || undefined }),
+    onSuccess: finish,
+  });
+  const { values: f, set, errors } = form;
+  const bind = (k) => ({ value: f[k], onChange: (e) => set({ [k]: e.target.value }), error: errors[k] });
 
   return (
     <div className="pb-8">
       <ScreenTitle title={S.register} />
-      <form onSubmit={submit} className="px-4 pt-6 space-y-4 max-w-md mx-auto" noValidate>
+      <form onSubmit={onSubmit(form)} className="px-4 pt-6 space-y-4 max-w-md mx-auto" noValidate>
         <div className="text-center mb-2">
           <h2 className="text-2xl font-extrabold">{S.registerTitle}</h2>
           <p className="text-muted">{S.registerHint}</p>
@@ -141,9 +125,9 @@ export function Register() {
           autoComplete="new-password"
           {...bind("password_confirmation")}
         />
-        <ErrorBanner error={apiError} />
-        <GoldButton type="submit" disabled={busy} className="w-full">
-          {busy ? S.loading : S.createAccount}
+        <ErrorBanner error={form.error} />
+        <GoldButton type="submit" disabled={form.busy} className="w-full">
+          {form.busy ? S.loading : S.createAccount}
         </GoldButton>
         <p className="text-center text-sm">
           {S.haveAccountQ}{" "}

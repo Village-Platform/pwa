@@ -1,20 +1,18 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { useLoad } from "../lib/hooks.js";
-import { formatDate, kindTone } from "../lib/format.js";
-import { S } from "../lib/strings.js";
-import Icon from "../components/Icon.jsx";
-import { Badge, ErrorBanner, ScreenTitle, SkeletonRows } from "../components/ui.jsx";
+import { Api } from "../../api/endpoints";
+import { useLoad, useShare } from "../../lib/hooks";
+import { formatDate, kindTone } from "../../lib/format";
+import { S } from "../../lib/strings";
+import Icon from "../../components/Icon.jsx";
+import { Badge, ErrorBanner, ScreenTitle, SkeletonRows } from "../../components/ui.jsx";
 
 export default function Article() {
   const { id } = useParams();
   const nav = useNavigate();
   const { data: a, error, loading, reload } = useLoad(() => Api.article(id).then((r) => r.data), [id]);
 
-  const share = () => {
-    if (navigator.share) navigator.share({ title: a.title, url: location.href }).catch(() => {});
-    else navigator.clipboard?.writeText(location.href);
-  };
+  const shareArticle = useShare();
+  const share = () => shareArticle({ title: a.title });
 
   return (
     <div className="pb-8">

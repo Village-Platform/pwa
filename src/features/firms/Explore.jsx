@@ -1,17 +1,10 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
-import { Api } from "../api/endpoints.js";
-import { useDebounced, useLoad, useOnVisible, usePaged } from "../lib/hooks.js";
-import { S } from "../lib/strings.js";
-import {
-  ErrorBanner,
-  FilterChipsRow,
-  FirmRow,
-  MessageBox,
-  ScreenTitle,
-  SearchPill,
-  SkeletonRows,
-} from "../components/ui.jsx";
+import { Api } from "../../api/endpoints";
+import { useDebounced, useLoad, usePaged } from "../../lib/hooks";
+import { S } from "../../lib/strings";
+import PagedList from "../../components/PagedList.jsx";
+import { FilterChipsRow, FirmRow, ScreenTitle, SearchPill } from "../../components/ui.jsx";
 
 export default function Explore() {
   const nav = useNavigate();
@@ -22,7 +15,6 @@ export default function Explore() {
 
   const cats = useLoad(() => Api.categories().then((r) => r.data));
   const list = usePaged((page) => Api.firms({ q: query, categoryId, page }), [query, categoryId]);
-  const sentinel = useOnVisible(() => list.loadMore());
 
   const chips = [{ value: null, label: S.all }, ...(cats.data || []).map((c) => ({ value: c.id, label: c.name }))];
 
@@ -40,17 +32,12 @@ export default function Explore() {
       {!list.loading && !list.error && list.items.length > 0 && (
         <p className="px-4 text-sm text-muted mb-2">{S.resultsCount(list.total)}</p>
       )}
-      <div className="px-4 space-y-2">
-        {list.items.map((f) => (
-          <FirmRow key={f.id} firm={f} onClick={() => nav(`/firms/${f.id}`)} />
-        ))}
-      </div>
-      {list.loading && <SkeletonRows count={list.items.length ? 2 : 6} />}
-      <ErrorBanner error={list.error} onRetry={list.retry} />
-      {!list.loading && !list.error && list.items.length === 0 && (
-        <MessageBox text={query ? S.searchNoResults(query) : S.noFirms} />
-      )}
-      <div ref={sentinel} className="h-1" />
+      <PagedList
+        list={list}
+        skeletons={[6, 2]}
+        empty={query ? S.searchNoResults(query) : S.noFirms}
+        renderItem={(f) => <FirmRow key={f.id} firm={f} onClick={() => nav(`/firms/${f.id}`)} />}
+      />
     </div>
   );
 }

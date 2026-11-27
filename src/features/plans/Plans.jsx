@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { Api } from "../api/endpoints.js";
-import { useLoad } from "../lib/hooks.js";
-import { useSession } from "../lib/session.js";
-import { egp } from "../lib/format.js";
-import { S } from "../lib/strings.js";
+import { Api } from "../../api/endpoints";
+import { useLoad } from "../../lib/hooks";
+import { useSession } from "../../lib/session";
+import { egp } from "../../lib/format";
+import { S } from "../../lib/strings";
 import {
   Badge,
   CheckLine,
@@ -13,7 +13,7 @@ import {
   MessageBox,
   ScreenTitle,
   SkeletonRows,
-} from "../components/ui.jsx";
+} from "../../components/ui.jsx";
 
 /** "اختر باقتك": the middle plan is highlighted as the most popular. Guests sign in first. */
 export default function Plans() {

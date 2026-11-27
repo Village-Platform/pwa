@@ -1,5 +1,5 @@
-import { S } from "../lib/strings.js";
-import { asset } from "../lib/asset.js";
+import { S } from "../../lib/strings";
+import { asset } from "../../lib/asset";
 
 // First launch only (Android WelcomeScreen): the splash artwork with "start" and "I have an account".
 const KEY = "aghour.welcomeDone";
