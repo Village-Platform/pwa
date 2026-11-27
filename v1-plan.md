@@ -23,11 +23,14 @@ Run `npm run check` before every commit.
 
 ## After the list above
 
-- [ ] Firebase: Analytics, and FCM notifications (web push). Device registration needs the backend to accept a web platform.
+- [x] Firebase: initialized from `VITE_FIREBASE_*` variables (off without them)
+- [x] Analytics: screen views and key actions; errors and crashes sent as `exception` events
+- [x] FCM web push: permission, token, device registration, service worker, detach on logout
+- [ ] Turn push on: add the Firebase web app and variables, then the backend accepts `platform: web` and sends `web_push: true`
 
 ## Blocked on the backend or a decision
 
-- Device registration and web push: the server accepts only `platform: android`
+- Web push: the server accepts only `platform: android`; it needs `web`, a `webpush` block in FCM messages, and the `web_push` flag
 - A logout endpoint that revokes the token (logout only deletes the local copy)
 - Deploy the `PATCH /me` fix; confirm CORS allows `X-Installation-Id`; confirm the topic JSON fields
 - Payment receipt upload (the receipts branch is on hold)
