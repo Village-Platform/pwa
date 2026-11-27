@@ -1,6 +1,18 @@
 import { S } from "./strings";
 import type { AppNotification } from "../api/types";
 
+/**
+ * A firm's status for its owner. The server marks a rejection as `suspended` plus a `rejection_reason`
+ * (rule F11), so "suspended" with a reason reads as "rejected".
+ */
+export function firmStatusLabel(
+  firm: { status: string; rejection_reason?: string | null },
+  labels: { firmStatus: Record<string, string>; firmStatusRejected: string },
+) {
+  if (firm.status === "suspended" && firm.rejection_reason) return labels.firmStatusRejected;
+  return labels.firmStatus[firm.status] || firm.status;
+}
+
 /** Badge colour. */
 export type Tone = "gold" | "red" | "green" | "gray";
 

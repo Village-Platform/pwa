@@ -143,6 +143,7 @@ export const S = {
   latitude: "خط العرض",
   longitude: "خط الطول",
   firmStatus: { active: "نشطة", pending: "قيد المراجعة", suspended: "موقوفة" },
+  firmStatusRejected: "مرفوضة",
   firmStatusLabel: "الحالة",
   errorRequired: "هذا الحقل مطلوب.",
   errorCategoryRequired: "اختر القسم.",

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { useLoad, useShare } from "../../lib/hooks";
 import { useSession } from "../../lib/session";
-import { firmStatusTone, mapUrl, whatsappUrl } from "../../lib/format";
+import { firmStatusLabel, firmStatusTone, mapUrl, whatsappUrl } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
 import ReviewControls from "../../components/ReviewControls.jsx";
@@ -74,8 +74,13 @@ export default function Firm() {
       </div>
 
       <div className="-mt-6 relative rounded-t-3xl bg-page p-5 space-y-4">
-        {firm.status !== "active" && (
-          <Badge tone={firmStatusTone(firm.status)}>{S.firmStatus[firm.status] || firm.status}</Badge>
+        {firm.status !== "active" && <Badge tone={firmStatusTone(firm.status)}>{firmStatusLabel(firm, S)}</Badge>}
+        {/* Only the owner and reviewers can open a firm that is not active, so only they see this. */}
+        {firm.status !== "active" && firm.rejection_reason && (
+          <p className="rounded-xl bg-bad/10 p-3 text-sm text-bad">
+            <span className="font-bold">{S.rejectReason}: </span>
+            {firm.rejection_reason}
+          </p>
         )}
         <h1 className="text-2xl font-black">{firm.name}</h1>
 

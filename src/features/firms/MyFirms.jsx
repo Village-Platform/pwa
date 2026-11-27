@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { usePaged } from "../../lib/hooks";
-import { firmStatusTone } from "../../lib/format";
+import { firmStatusLabel, firmStatusTone } from "../../lib/format";
 import { S } from "../../lib/strings";
 import Icon from "../../components/Icon.jsx";
 import PullToRefresh from "../../components/PullToRefresh.jsx";
@@ -30,8 +30,11 @@ export default function MyFirms() {
           className="px-4 pt-4 space-y-2.5"
           renderItem={(f) => (
             <div key={f.id} className="space-y-1">
-              <Badge tone={firmStatusTone(f.status)}>{S.firmStatus[f.status] || f.status}</Badge>
+              <Badge tone={firmStatusTone(f.status)}>{firmStatusLabel(f, S)}</Badge>
               <FirmRow firm={f} onClick={() => nav(`/firms/${f.id}`)} />
+              {f.status !== "active" && f.rejection_reason && (
+                <p className="text-sm text-bad px-1">{f.rejection_reason}</p>
+              )}
             </div>
           )}
         />
