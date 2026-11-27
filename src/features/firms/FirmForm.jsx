@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../../api/endpoints";
+import { normalizeDigits, validCoordinates } from "../../lib/format";
 import { useLoad } from "../../lib/hooks";
 import { useForm } from "../../lib/useForm";
 import { useSession } from "../../lib/session";
@@ -55,10 +56,7 @@ export default function FirmForm() {
     initial: EMPTY,
     fieldMap: { category_id: "categoryId", working_hours: "workingHours" },
     validate: (f) => {
-      const lat = f.latitude.trim();
-      const lng = f.longitude.trim();
-      const coordsOk =
-        (lat === "" && lng === "") || (lat !== "" && lng !== "" && !isNaN(Number(lat)) && !isNaN(Number(lng)));
+      const coordsOk = validCoordinates(f.latitude, f.longitude);
       const errs = {};
       if (!f.name.trim()) errs.name = S.errorRequired;
       if (!f.categoryId) errs.categoryId = S.errorCategoryRequired;
@@ -162,7 +160,8 @@ export default function FirmForm() {
           inputMode="tel"
           dir="ltr"
           value={f.phone}
-          onChange={(e) => set({ phone: e.target.value })}
+          onChange={(e) => set({ phone: normalizeDigits(e.target.value) })}
+          error={errors.phone}
         />
         <FormField
           label={S.whatsapp}
@@ -170,21 +169,35 @@ export default function FirmForm() {
           inputMode="tel"
           dir="ltr"
           value={f.whatsapp}
-          onChange={(e) => set({ whatsapp: e.target.value })}
+          onChange={(e) => set({ whatsapp: normalizeDigits(e.target.value) })}
+          error={errors.whatsapp}
         />
-        <FormField label={S.address} value={f.address} onChange={(e) => set({ address: e.target.value })} />
+        <FormField
+          label={S.address}
+          value={f.address}
+          onChange={(e) => set({ address: e.target.value })}
+          error={errors.address}
+        />
         <FormField
           label={S.workingHours}
           value={f.workingHours}
           onChange={(e) => set({ workingHours: e.target.value })}
+          error={errors.workingHours}
         />
         <LocationPicker
           latitude={f.latitude}
           longitude={f.longitude}
-          onChange={(latitude, longitude) => set({ latitude, longitude })}
-          error={errors.latitude}
+          onChange={(latitude, longitude) =>
+            set({ latitude: normalizeDigits(latitude), longitude: normalizeDigits(longitude) })
+          }
+          error={errors.latitude || errors.longitude}
         />
-        <TextArea label={S.description} value={f.description} onChange={(e) => set({ description: e.target.value })} />
+        <TextArea
+          label={S.description}
+          value={f.description}
+          onChange={(e) => set({ description: e.target.value })}
+          error={errors.description}
+        />
       </FormPage>
 
       {reviewDialog && (

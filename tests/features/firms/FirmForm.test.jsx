@@ -87,4 +87,33 @@ describe("FirmForm", () => {
       expect(screen.getByLabelText(new RegExp(S.firmName))).toHaveAccessibleDescription("الاسم مستخدم"),
     );
   });
+
+  it("shows a server error on a field that used to fail silently", async () => {
+    mockApi(
+      json(422, {
+        error: { code: "validation_failed", message: "تحقّق من البيانات", details: { phone: ["رقم غير صالح"] } },
+      }),
+    );
+    open();
+    fireEvent.change(await screen.findByLabelText(new RegExp(S.firmName)), { target: { value: "صيدلية" } });
+    fireEvent.click(await screen.findByRole("button", { name: "صيدليات" }));
+    fireEvent.change(screen.getByLabelText(new RegExp(`^${S.phone}`)), { target: { value: "0101" } });
+    fireEvent.click(screen.getByRole("button", { name: S.save }));
+    await waitFor(() =>
+      expect(screen.getByLabelText(new RegExp(`^${S.phone}`))).toHaveAccessibleDescription("رقم غير صالح"),
+    );
+    expect(screen.getByText("تحقّق من البيانات")).toBeInTheDocument();
+  });
+
+  it("refuses coordinates out of range before calling the server", async () => {
+    const fetchMock = mockApi(json(201, {}));
+    open();
+    fireEvent.change(await screen.findByLabelText(new RegExp(S.firmName)), { target: { value: "صيدلية" } });
+    fireEvent.click(await screen.findByRole("button", { name: "صيدليات" }));
+    fireEvent.change(screen.getByLabelText(new RegExp(`^${S.latitude}`)), { target: { value: "200" } });
+    fireEvent.change(screen.getByLabelText(new RegExp(`^${S.longitude}`)), { target: { value: "31" } });
+    fireEvent.click(screen.getByRole("button", { name: S.save }));
+    expect(screen.getByText(S.errorCoordinates)).toBeInTheDocument();
+    expect(fetchMock.mock.calls.some(([, i]) => i?.method === "POST")).toBe(false);
+  });
 });

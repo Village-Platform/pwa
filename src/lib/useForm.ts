@@ -16,7 +16,7 @@ import { fieldErrors } from "./errors";
  *   form.save(), form.reset(values)
  *
  * Editing any field clears the shown errors. A 422 `validation_failed` is spread over the fields it
- * names; the banner error is kept only when none of them is a field of this form.
+ * names, and the server's message is also kept as the banner error, so nothing fails silently.
  */
 /** { field: message } */
 export type FieldErrors = Record<string, string>;
@@ -73,12 +73,9 @@ export function useForm<V extends object, R = unknown>({
       const error = e as Error;
       const server = fieldErrors(error, fieldMap);
       const known = Object.keys(server).filter((f) => f in values);
-      if (known.length) {
-        setErrors(Object.fromEntries(known.map((f) => [f, server[f]])));
-        setState({ busy: false, error: null });
-      } else {
-        setState({ busy: false, error });
-      }
+      if (known.length) setErrors(Object.fromEntries(known.map((f) => [f, server[f]])));
+      // The banner stays too: a field the screen does not display (or forgot to) must never fail silently.
+      setState({ busy: false, error });
     }
   }, []);
 

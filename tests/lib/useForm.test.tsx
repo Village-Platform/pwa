@@ -71,7 +71,7 @@ describe("useForm", () => {
     act(() => result.current.set({ name: "a" }));
     await act(() => result.current.save());
     expect(result.current.errors).toEqual({ workingHours: "too long" });
-    expect(result.current.error).toBeNull();
+    expect(result.current.error).toBe(error); // the banner stays, so nothing fails silently
   });
 
   it("keeps other errors as a banner error", async () => {
