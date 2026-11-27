@@ -8,6 +8,8 @@ type Paging = { page?: number; perPage?: number };
 export const owner = {
   myFirms: ({ page = 1, perPage = 20 }: Paging = {}) =>
     api<Page<Firm>>("firms", { query: { mine: "true", page, per_page: perPage } }),
+  myArticles: ({ page = 1, perPage = 20 }: Paging = {}) =>
+    api<Page<Article>>("articles", { query: { mine: "true", page, per_page: perPage } }),
   createFirm: (firm: FirmInput) => api<Envelope<Firm>>("firms", { method: "POST", body: { firm } }),
   updateFirm: (id: number, firm: FirmInput) => api<Envelope<Firm>>(`firms/${id}`, { method: "PATCH", body: { firm } }),
   setFirmStatus: (id: number, status: FirmStatus) =>

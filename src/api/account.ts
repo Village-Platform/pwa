@@ -1,5 +1,5 @@
 import { api } from "./client";
-import type { AuthResult, Envelope, User } from "./types";
+import type { AuthResult, Envelope, User, UserUpdate } from "./types";
 
 export interface RegisterInput {
   name: string;
@@ -15,6 +15,8 @@ export const account = {
     api<Envelope<AuthResult>>("auth/login", { method: "POST", body: { phone, password } }),
   register: (user: RegisterInput) => api<Envelope<AuthResult>>("auth/register", { method: "POST", body: { user } }),
   me: () => api<Envelope<User>>("me"),
+  /** After a password change the reply carries `meta.token`: the only token that still works. */
+  updateMe: (user: UserUpdate) => api<Envelope<User>>("me", { method: "PATCH", body: { user } }),
   changePassword: (password: string, password_confirmation: string) =>
     api<Envelope<User>>("me", { method: "PATCH", body: { user: { password, password_confirmation } } }),
   deleteAccount: (password: string) => api<null>("me", { method: "DELETE", body: { password } }),
