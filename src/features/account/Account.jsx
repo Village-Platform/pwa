@@ -124,11 +124,13 @@ function Profile({ user, onAbout }) {
             onClick={() => nav("/my-firms")}
           />
           <Row icon="addBusiness" label={S.addFirm} onClick={() => nav("/firms/new")} />
+          <Row icon="news" label={S.myArticles} onClick={() => nav("/my-articles")} />
           <Row icon="postAdd" label={S.addArticle} onClick={() => nav("/articles/new")} />
           {plansOn && <Row icon="card" label={S.subscriptionAndPlans} onClick={() => nav("/plans")} />}
           {plansOn && <Row icon="payments" label={S.paymentsHistory} onClick={() => nav("/payments")} />}
           <Row icon="bell" label={S.notifications} onClick={() => nav("/notifications")} />
           <Row icon="palette" label={S.appearanceMenu} onClick={() => nav("/settings")} />
+          <Row icon="person" label={S.editProfile} onClick={() => nav("/edit-profile")} />
           <Row icon="lock" label={S.changePassword} onClick={() => nav("/change-password")} />
           <Row icon="android" label={S.androidApp} href={PLAY_URL} />
           <Row icon="info" label={S.aboutApp} onClick={onAbout} />

@@ -24,11 +24,13 @@ function Inbox() {
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [readIds, setReadIds] = useState(() => new Set());
   const [allRead, setAllRead] = useState(false);
-  const list = usePaged((page) => Api.notifications({ page }), []);
+  // The unread filter is the server's (`unread=true`), so paging works across the whole inbox.
+  // Rows opened in this session stay listed until the next refresh, but are shown as read.
+  const list = usePaged((page) => Api.notifications({ page, unread: unreadOnly }), [unreadOnly]);
 
   const isRead = (n) => n.read || allRead || readIds.has(n.id);
   const unreadCount = list.items.filter((n) => !isRead(n)).length;
-  const visible = unreadOnly ? list.items.filter((n) => !isRead(n)) : list.items;
+  const visible = list.items;
 
   // Optimistic: shown as read right away, then the server is told (same as Android).
   const open = (n) => {
@@ -65,7 +67,7 @@ function Inbox() {
           return list.refresh();
         }}
       >
-        {list.items.length > 0 && (
+        {(list.items.length > 0 || unreadOnly) && (
           <FilterChipsRow
             items={[
               { value: false, label: S.all },
