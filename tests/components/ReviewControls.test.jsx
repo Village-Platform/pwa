@@ -22,7 +22,9 @@ const show = (props) =>
 
 describe("ReviewControls", () => {
   it("approves and hands back the server's record", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: { id: 5, status: "active" } }));
+    const spy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => json(200, { data: { id: 5, status: "active" } }));
     const onChanged = vi.fn();
     show({ onChanged });
     fireEvent.click(screen.getByRole("button", { name: S.approve }));
@@ -41,7 +43,9 @@ describe("ReviewControls", () => {
   });
 
   it("rejects with the reason", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: { id: 5, status: "suspended" } }));
+    const spy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => json(200, { data: { id: 5, status: "suspended" } }));
     const onChanged = vi.fn();
     show({ onChanged });
     fireEvent.click(screen.getByRole("button", { name: S.reject }));
@@ -52,7 +56,7 @@ describe("ReviewControls", () => {
   });
 
   it("shows the server's message when it refuses", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
       json(422, { error: { code: "already_reviewed", message: "تمت مراجعته" } }),
     );
     show();

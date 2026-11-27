@@ -40,7 +40,7 @@ describe("Login", () => {
   });
 
   it("signs in and returns to the screen that asked for it", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: { token: "t1", user: { id: 5 } } }));
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () => json(200, { data: { token: "t1", user: { id: 5 } } }));
     open();
     fill("01012345678", "secret123");
     expect(await screen.findByText("my firms")).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("Login", () => {
   });
 
   it("shows the server's message for wrong credentials", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
       json(401, { error: { code: "invalid_credentials", message: "بيانات الدخول غير صحيحة" } }),
     );
     open();

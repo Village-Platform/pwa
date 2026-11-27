@@ -24,7 +24,9 @@ const save = () => fireEvent.click(screen.getByRole("button", { name: S.save }))
 
 describe("EditProfile", () => {
   it("saves a name change without asking for the password, and updates the session", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: { ...USER, name: "Omar" } }));
+    const spy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => json(200, { data: { ...USER, name: "Omar" } }));
     open();
     expect(screen.queryByLabelText(S.currentPassword)).not.toBeInTheDocument();
     fireEvent.change(field(S.name), { target: { value: "Omar" } });
@@ -38,7 +40,9 @@ describe("EditProfile", () => {
   });
 
   it("asks for the current password when the phone changes, and sends it", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: { ...USER, phone: "01099999999" } }));
+    const spy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => json(200, { data: { ...USER, phone: "01099999999" } }));
     open();
     fireEvent.change(field(S.phoneNumber), { target: { value: "01099999999" } });
     save();
@@ -51,7 +55,9 @@ describe("EditProfile", () => {
   });
 
   it("clears the email when it is emptied", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: { ...USER, email: null } }));
+    const spy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => json(200, { data: { ...USER, email: null } }));
     open();
     fireEvent.change(field(S.emailOptional), { target: { value: "" } });
     save();
@@ -60,7 +66,7 @@ describe("EditProfile", () => {
   });
 
   it("shows the server's message when the phone is taken", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
       json(422, { error: { code: "phone_taken", message: "الرقم مستخدم" } }),
     );
     open();

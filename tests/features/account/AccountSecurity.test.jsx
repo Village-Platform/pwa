@@ -26,7 +26,7 @@ describe("ChangePassword", () => {
   it("keeps the fresh token the server returns, since older ones are revoked", async () => {
     const fetchMock = vi
       .spyOn(globalThis, "fetch")
-      .mockResolvedValue(json(200, { data: { id: 1, name: "Ali" }, meta: { token: "new-token" } }));
+      .mockImplementation(async () => json(200, { data: { id: 1, name: "Ali" }, meta: { token: "new-token" } }));
     const { password, confirmation } = fill();
     fireEvent.change(password, { target: { value: "secret123" } });
     fireEvent.change(confirmation, { target: { value: "secret123" } });

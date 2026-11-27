@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import PagedList from "@/components/PagedList.jsx";
+import { ApiError } from "@/api/client";
+import { S } from "@/lib/strings";
 
 // jsdom has no IntersectionObserver.
 globalThis.IntersectionObserver ??= class {
@@ -43,9 +45,15 @@ describe("PagedList", () => {
   });
 
   it("shows the server's error message", () => {
-    show(list({ error: new Error("تعذّر") }));
+    show(list({ error: new ApiError("تعذّر") }));
     expect(screen.getByText("تعذّر")).toBeInTheDocument();
     expect(screen.queryByText("nothing here")).not.toBeInTheDocument();
+  });
+
+  it("never shows a technical error text", () => {
+    show(list({ error: new TypeError("Cannot read properties of null") }));
+    expect(screen.getByText(S.genericError)).toBeInTheDocument();
+    expect(screen.queryByText(/Cannot read/)).not.toBeInTheDocument();
   });
 
   it("follows `items` for the empty message (a client-side filter)", () => {

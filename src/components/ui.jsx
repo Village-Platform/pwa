@@ -2,7 +2,7 @@ import { useId } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "./Icon.jsx";
 import { S } from "../lib/strings";
-import { assetUrl } from "../api/client";
+import { ApiError, assetUrl } from "../api/client";
 import { kindTone } from "../lib/format";
 import { asset } from "../lib/asset";
 import { errorAction } from "../lib/errors";
@@ -110,7 +110,8 @@ export function ErrorBanner({ error, onRetry }) {
   if (!error) return null;
   return (
     <div className="mx-4 my-3 rounded-xl border border-bad/40 bg-bad/10 p-3 text-sm" role="alert">
-      <p className="text-bad">{error.message || S.genericError}</p>
+      {/* The server's Arabic message, or a generic one: never a technical (English) error text. */}
+      <p className="text-bad">{error instanceof ApiError ? error.message || S.genericError : S.genericError}</p>
       {action && actionAllowed && (
         <Link to={action.to} className="mt-2 inline-block font-bold text-ink underline">
           {action.label}

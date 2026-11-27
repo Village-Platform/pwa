@@ -13,7 +13,7 @@ const lastCall = (spy: Parameters<typeof sent>[0]) => sent(spy);
 
 describe("review, lists and topics", () => {
   it("rejects with a reason", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: {} }));
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation(async () => json(200, { data: {} }));
     await Api.rejectFirm(5, "بيانات ناقصة");
     const { url, init } = lastCall(spy);
     expect(url.pathname).toMatch(/\/firms\/5\/reject$/);
@@ -22,7 +22,7 @@ describe("review, lists and topics", () => {
   });
 
   it("asks for pending items, own articles and unread notifications", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: [] }));
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation(async () => json(200, { data: [] }));
     await Api.pendingArticles();
     expect(lastCall(spy).url.searchParams.get("review")).toBe("pending");
     await Api.myArticles();
@@ -34,7 +34,7 @@ describe("review, lists and topics", () => {
   });
 
   it("opts in and out of a topic for this install", async () => {
-    const spy = vi.spyOn(globalThis, "fetch").mockResolvedValue(json(200, { data: {} }));
+    const spy = vi.spyOn(globalThis, "fetch").mockImplementation(async () => json(200, { data: {} }));
     await Api.optInTopic("news");
     expect(lastCall(spy).url.pathname).toMatch(/\/devices\/[^/]+\/topics\/news$/);
     expect(lastCall(spy).init.method).toBe("PUT");
