@@ -108,8 +108,13 @@ export function usePaged<T>(fetchPage: (page: number) => Promise<Page<T>>, deps:
   };
 }
 
-/** Calls onVisible when the returned ref's element scrolls into view. */
-export function useOnVisible(onVisible: () => unknown) {
+/**
+ * Calls onVisible when the returned ref's element scrolls into view. An observer only reports changes,
+ * so an element that is already on screen when a page finishes loading would never fire again; pass
+ * `recheck` values (for example the item count and the loading flag) and the element is observed afresh
+ * whenever they change, which reports its current visibility.
+ */
+export function useOnVisible(onVisible: () => unknown, recheck: DepList = []) {
   const ref = useRef<HTMLDivElement>(null);
   const cb = useRef(onVisible);
   cb.current = onVisible;
@@ -121,7 +126,8 @@ export function useOnVisible(onVisible: () => unknown) {
     });
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, recheck);
   return ref;
 }
 

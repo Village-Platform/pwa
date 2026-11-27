@@ -60,4 +60,35 @@ describe("PagedList", () => {
     show(list({ items: [1] }), { items: [] });
     expect(screen.getByText("nothing here")).toBeInTheDocument();
   });
+
+  it("loads the next page when the end of the list is still visible after a page loads", () => {
+    // An observer that reports "visible" every time it starts observing, like a tall screen.
+    const original = globalThis.IntersectionObserver;
+    globalThis.IntersectionObserver = class {
+      constructor(cb) {
+        this.cb = cb;
+      }
+      observe() {
+        this.cb([{ isIntersecting: true }]);
+      }
+      disconnect() {}
+    };
+    try {
+      const loadMore = vi.fn();
+      const { rerender } = show(list({ items: [1], loadMore }));
+      expect(loadMore).toHaveBeenCalledTimes(1);
+      rerender(
+        <MemoryRouter>
+          <PagedList
+            list={list({ items: [1, 2], loadMore })}
+            empty="nothing here"
+            renderItem={(i) => <p key={i}>{`item ${i}`}</p>}
+          />
+        </MemoryRouter>,
+      );
+      expect(loadMore).toHaveBeenCalledTimes(2);
+    } finally {
+      globalThis.IntersectionObserver = original;
+    }
+  });
 });

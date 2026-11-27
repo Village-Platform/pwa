@@ -20,7 +20,8 @@ export default function PagedList({
   skeletons = [5, 2],
   className = "px-4 space-y-2",
 }) {
-  const sentinel = useOnVisible(() => list.loadMore());
+  // Re-check after every page: on a tall screen the end of the list can still be visible.
+  const sentinel = useOnVisible(() => list.loadMore(), [list.items.length, list.loading]);
   return (
     <>
       <div className={className}>{items.map(renderItem)}</div>
