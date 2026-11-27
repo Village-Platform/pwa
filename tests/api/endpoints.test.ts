@@ -42,3 +42,26 @@ describe("review, lists and topics", () => {
     expect(lastCall(spy).init.method).toBe("DELETE");
   });
 });
+
+describe("public article feed", () => {
+  it("keeps drafts, pending, rejected and scheduled articles out (reviewers get them all)", async () => {
+    const past = "2020-01-01T00:00:00Z";
+    const future = "2999-01-01T00:00:00Z";
+    const a = (id: number, review_status: string, published_at: string | null) => ({ id, review_status, published_at });
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
+      json(200, {
+        data: [
+          a(1, "approved", past),
+          a(2, "approved", null),
+          a(3, "pending", past),
+          a(4, "rejected", past),
+          a(5, "approved", future),
+          { id: 6, published_at: past },
+        ],
+        meta: { total_pages: 1 },
+      }),
+    );
+    const res = await Api.articles();
+    expect(res.data.map((x) => x.id)).toEqual([1, 6]);
+  });
+});
