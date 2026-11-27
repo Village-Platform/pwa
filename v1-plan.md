@@ -7,19 +7,19 @@ Run `npm run check` before every commit.
 
 ## Must fix for V1
 
-- [ ] Firm form: show server validation errors on every field, and check coordinate ranges (lat ±90, lng ±180)
-- [ ] API client: time out stalled requests instead of loading forever
-- [ ] API client: if the guest token can't be fetched (for example rate limited), still send the request without it
-- [ ] API client: a late 401 must not sign out a user who has since signed in again
-- [ ] API client: treat a 200 reply that is not JSON (captive portal) as an error, and never show technical error text
-- [ ] Infinite lists: keep loading when the end of the list is already on screen
-- [ ] Accept Arabic-Indic digits (٠١٢…) in phone numbers and coordinates
-- [ ] Account: show a retry instead of "0 firms" and a subscribe prompt when loading fails; count firms with `meta.total`
-- [ ] Firm pages: show the rejection reason to the owner
-- [ ] Notifications: a notification with an unknown screen opens the inbox; use the server's unread count; report failed mark-as-read
-- [ ] News and Home: reviewers should not see drafts or pending articles in the public feeds
-- [ ] Explore: keep the search in the URL, and only scroll to the top on forward navigation
-- [ ] CI: run lint, typecheck and tests on pull requests too
+- [x] Firm form: show server validation errors on every field, and check coordinate ranges (lat ±90, lng ±180)
+- [x] API client: time out stalled requests instead of loading forever
+- [x] API client: if the guest token can't be fetched (for example rate limited), still send the request without it
+- [x] API client: a late 401 must not sign out a user who has since signed in again
+- [x] API client: treat a 200 reply that is not JSON (captive portal) as an error, and never show technical error text
+- [x] Infinite lists: keep loading when the end of the list is already on screen
+- [x] Accept Arabic-Indic digits (٠١٢…) in phone numbers and coordinates
+- [x] Account: show a retry instead of "0 firms" and a subscribe prompt when loading fails; count firms with `meta.total`
+- [x] Firm pages: show the rejection reason to the owner
+- [x] Notifications: a notification with an unknown screen opens the inbox; use the server's unread count; report failed mark-as-read
+- [x] News and Home: reviewers should not see drafts or pending articles in the public feeds
+- [x] Explore: keep the search in the URL, and only scroll to the top on forward navigation
+- [x] CI: run lint, typecheck and tests on pull requests too
 
 ## After the list above
 
