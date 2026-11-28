@@ -246,4 +246,20 @@ export const S = {
     weeks: (n: number) => `منذ ${n} أسابيع`,
   },
   currency: "ج.م",
+
+  // Profile
+  editProfile: "تعديل الملف الشخصي",
+  currentPassword: "كلمة المرور الحالية",
+  currentPasswordHint: "مطلوبة عند تغيير رقم الهاتف.",
+  profileSaved: "تم حفظ التعديلات.",
+  // My articles
+  myArticles: "مقالاتي",
+  noMyArticles: "لم تنشر أي مقال بعد.",
+  reviewStatus: { approved: "منشور", pending: "قيد المراجعة", rejected: "مرفوض" },
+  // Topics
+  notificationSettings: "إعدادات الإشعارات",
+  topicsTitle: "المواضيع",
+  topicsHint: "اختر المواضيع التي تريد أن تصلك إشعاراتها.",
+  noTopics: "لا توجد مواضيع حالياً.",
+  topicSaveFailed: "تعذّر حفظ الاختيار.",
 };
