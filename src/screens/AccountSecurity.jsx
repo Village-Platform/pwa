@@ -21,7 +21,9 @@ export function ChangePassword() {
     if (Object.keys(errs).length) return;
     setSubmit({ busy: true, error: null });
     try {
-      await Api.changePassword(f.password, f.confirmation);
+      const res = await Api.changePassword(f.password, f.confirmation);
+      // The server revokes every older token on a password change and returns a fresh one.
+      if (res?.meta?.token) session.signIn({ token: res.meta.token, user: res.data ?? session.get().user });
       toast(S.passwordChanged);
       nav(-1);
     } catch (error) {

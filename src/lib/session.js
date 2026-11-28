@@ -17,6 +17,12 @@ const read = () => {
 let state = read();
 const listeners = new Set();
 const emit = () => listeners.forEach((l) => l());
+// Cached API reads can differ per user (e.g. `can` flags), so drop them whenever the identity changes.
+const dropApiCache = () => {
+  try {
+    caches?.delete("api-read");
+  } catch {}
+};
 const set = (key, value) => (value == null ? localStorage.removeItem(key) : localStorage.setItem(key, value));
 
 export const session = {
@@ -26,6 +32,7 @@ export const session = {
     set(K.token, token);
     set(K.user, JSON.stringify(user));
     state = { ...state, token, user };
+    dropApiCache();
     emit();
   },
   setUser(user) {
@@ -41,6 +48,7 @@ export const session = {
     set(K.token, null);
     set(K.user, null);
     state = { ...state, token: null, user: null };
+    dropApiCache();
     emit();
   },
 };
