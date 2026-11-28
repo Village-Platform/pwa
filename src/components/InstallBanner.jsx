@@ -41,7 +41,7 @@ export default function InstallBanner({ force = false }) {
   return (
     <div className="mx-4 mt-4 rounded-2xl border border-gold/50 bg-gold/10 p-4 relative">
       {!force && (
-        <button onClick={dismiss} className="absolute top-2 end-2 p-1 text-muted" aria-label={S.installLater}>
+        <button onClick={dismiss} className="absolute top-2 inset-e-2 p-1 text-muted" aria-label={S.installLater}>
           <Icon name="close" size={20} />
         </button>
       )}

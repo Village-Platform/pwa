@@ -229,7 +229,7 @@ function Overlay({ onClick, label, icon }) {
     <button
       onClick={onClick}
       aria-label={label}
-      className="w-10 h-10 rounded-full bg-black/35 text-white grid place-items-center backdrop-blur"
+      className="w-10 h-10 rounded-full bg-black/35 text-white grid place-items-center backdrop-blur-sm"
     >
       <Icon name={icon} />
     </button>

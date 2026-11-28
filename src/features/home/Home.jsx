@@ -54,7 +54,7 @@ export default function Home() {
             >
               <Icon name="bell" />
               {unread.data > 0 && (
-                <span className="absolute -top-1.5 -end-1.5 w-5 h-5 rounded-full bg-bad text-white text-[10px] font-black grid place-items-center border-[1.5px] border-surface">
+                <span className="absolute -top-1.5 -inset-e-1.5 w-5 h-5 rounded-full bg-bad text-white text-[10px] font-black grid place-items-center border-[1.5px] border-surface">
                   {unread.data > 9 ? "9+" : unread.data}
                 </span>
               )}
@@ -98,15 +98,11 @@ export default function Home() {
               <img
                 src={asset("brand/cover_banner.jpg")}
                 alt=""
-                className="w-full aspect-[2/1] object-cover rounded-2xl"
+                className="w-full aspect-2/1 object-cover rounded-2xl"
               />
             </button>
           ) : (
-            <img
-              src={asset("brand/cover_banner.jpg")}
-              alt=""
-              className="w-full aspect-[2/1] object-cover rounded-2xl"
-            />
+            <img src={asset("brand/cover_banner.jpg")} alt="" className="w-full aspect-2/1 object-cover rounded-2xl" />
           )}
         </div>
 

@@ -14,7 +14,7 @@ import { useModal } from "../lib/useModal";
 export function ScreenTitle({ title, back = true, action }) {
   const nav = useNavigate();
   return (
-    <header className="sticky top-0 z-20 bg-page/95 backdrop-blur pt-safe border-b border-line">
+    <header className="sticky top-0 z-20 bg-page/95 backdrop-blur-sm pt-safe border-b border-line">
       <div className="flex items-center gap-2 h-14 px-2">
         {back && (
           <button
@@ -230,7 +230,7 @@ export function SearchPill({ value, onChange, placeholder, autoFocus, onClick, r
         autoFocus={autoFocus}
         readOnly={readOnly}
         enterKeyHint="search"
-        className="flex-1 bg-transparent outline-none text-ink placeholder:text-muted text-base"
+        className="flex-1 bg-transparent outline-hidden text-ink placeholder:text-muted text-base"
       />
     </label>
   );
@@ -249,7 +249,7 @@ export function FormField({ label, error, ...props }) {
         {...props}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full h-12 rounded-xl bg-surface2 px-4 text-base outline-none border ${
+        className={`w-full h-12 rounded-xl bg-surface2 px-4 text-base outline-hidden border ${
           error ? "border-bad" : "border-transparent focus:border-gold"
         }`}
       />
@@ -272,7 +272,7 @@ export function TextArea({ label, error, rows = 5, ...props }) {
         {...props}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className={`w-full rounded-xl bg-surface2 px-4 py-3 text-base outline-none border resize-y ${
+        className={`w-full rounded-xl bg-surface2 px-4 py-3 text-base outline-hidden border resize-y ${
           error ? "border-bad" : "border-transparent focus:border-gold"
         }`}
       />
@@ -317,7 +317,7 @@ export function SwitchRow({ label, checked, onChange }) {
         className={`relative w-12 h-7 rounded-full transition-colors ${checked ? "bg-gold" : "bg-line"}`}
       >
         <span
-          className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-all ${checked ? "start-[22px]" : "start-0.5"}`}
+          className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-all ${checked ? "inset-s-[22px]" : "inset-s-0.5"}`}
         />
       </button>
     </div>
@@ -359,7 +359,7 @@ function Modal({ title, lead, onClose, className = "", children }) {
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
         tabIndex={-1}
-        className={`w-full max-w-sm rounded-2xl bg-surface p-5 outline-none ${className}`}
+        className={`w-full max-w-sm rounded-2xl bg-surface p-5 outline-hidden ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {lead}
