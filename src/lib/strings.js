@@ -207,7 +207,13 @@ export const S = {
   noPayments: "لا توجد مدفوعات بعد.",
   reference: "المرجع:",
   until: (d) => `حتى ${d}`,
-  subscriptionState: { current: "ساري", scheduled: "مجدول", pending: "قيد المراجعة", rejected: "مرفوض", expired: "منتهي" },
+  subscriptionState: {
+    current: "ساري",
+    scheduled: "مجدول",
+    pending: "قيد المراجعة",
+    rejected: "مرفوض",
+    expired: "منتهي",
+  },
   paymentMethod: { instapay: "إنستاباي", vodafone_cash: "فودافون كاش" },
 
   // Password / delete account

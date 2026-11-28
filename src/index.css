@@ -1,7 +1,27 @@
-@font-face { font-family: "Cairo"; font-weight: 400; font-display: swap; src: url("/fonts/cairo_regular.ttf") format("truetype"); }
-@font-face { font-family: "Cairo"; font-weight: 600; font-display: swap; src: url("/fonts/cairo_semibold.ttf") format("truetype"); }
-@font-face { font-family: "Cairo"; font-weight: 700; font-display: swap; src: url("/fonts/cairo_bold.ttf") format("truetype"); }
-@font-face { font-family: "Cairo"; font-weight: 800; font-display: swap; src: url("/fonts/cairo_extrabold.ttf") format("truetype"); }
+@font-face {
+  font-family: "Cairo";
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/cairo_regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Cairo";
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/cairo_semibold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Cairo";
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/cairo_bold.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Cairo";
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/cairo_extrabold.ttf") format("truetype");
+}
 
 @tailwind base;
 @tailwind components;
@@ -16,29 +36,33 @@
   --ink: 0 0 0;
   --muted: 82 82 82;
   --line: 226 226 226;
-  --gold: 16 185 129;      /* MintGreen #10B981 */
-  --goldInk: 4 120 87;     /* #047857 */
-  --brand: 11 55 39;       /* Forest #0B3727 */
+  --gold: 16 185 129; /* MintGreen #10B981 */
+  --goldInk: 4 120 87; /* #047857 */
+  --brand: 11 55 39; /* Forest #0B3727 */
   --ok: 31 122 77;
   --bad: 179 64 47;
   color-scheme: light;
 }
 .dark {
-  --page: 13 17 23;        /* #0D1117 */
-  --surface: 22 27 34;     /* #161B22 */
-  --surface2: 33 38 45;    /* #21262D */
-  --ink: 230 237 243;      /* #E6EDF3 */
-  --muted: 139 148 158;    /* #8B949E */
-  --line: 48 54 61;        /* #30363D */
-  --gold: 52 211 153;      /* #34D399 */
-  --goldInk: 110 231 183;  /* #6EE7B7 */
+  --page: 13 17 23; /* #0D1117 */
+  --surface: 22 27 34; /* #161B22 */
+  --surface2: 33 38 45; /* #21262D */
+  --ink: 230 237 243; /* #E6EDF3 */
+  --muted: 139 148 158; /* #8B949E */
+  --line: 48 54 61; /* #30363D */
+  --gold: 52 211 153; /* #34D399 */
+  --goldInk: 110 231 183; /* #6EE7B7 */
   --brand: 11 55 39;
   --ok: 63 185 80;
   --bad: 248 81 73;
   color-scheme: dark;
 }
 
-html, body, #root { min-height: 100%; }
+html,
+body,
+#root {
+  min-height: 100%;
+}
 body {
   font-family: "Cairo", system-ui, sans-serif;
   -webkit-tap-highlight-color: transparent;
@@ -46,7 +70,15 @@ body {
   overscroll-behavior-y: none;
 }
 /* iOS notch / home indicator */
-.pt-safe { padding-top: env(safe-area-inset-top); }
-.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { scrollbar-width: none; }
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}

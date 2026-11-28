@@ -55,7 +55,9 @@ function Shell() {
 
   return (
     <div className={`max-w-xl mx-auto min-h-screen ${showTabs ? "pb-24" : ""}`}>
-      {!online && <div className="sticky top-0 z-40 bg-ink text-page text-center text-sm py-1.5 pt-safe">{S.offline}</div>}
+      {!online && (
+        <div className="sticky top-0 z-40 bg-ink text-page text-center text-sm py-1.5 pt-safe">{S.offline}</div>
+      )}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
@@ -83,7 +85,15 @@ function Shell() {
         <Route path="/pay/:planId" element={plans(user(<Pay />))} />
         <Route path="/payments" element={plans(user(<Payments />))} />
 
-        <Route path="*" element={<><ScreenTitle title="" /><MessageBox text={S.notFound} /></>} />
+        <Route
+          path="*"
+          element={
+            <>
+              <ScreenTitle title="" />
+              <MessageBox text={S.notFound} />
+            </>
+          }
+        />
       </Routes>
       {showTabs && <TabBar />}
       <ToastHost />

@@ -7,7 +7,16 @@ import { S } from "../lib/strings.js";
 import Icon from "../components/Icon.jsx";
 import InstallBanner from "../components/InstallBanner.jsx";
 import {
-  AlertBox, Badge, BrandMark, CheckLine, DangerButton, Dialog, GhostButton, GoldButton, LetterAvatar, SurfaceCard,
+  AlertBox,
+  Badge,
+  BrandMark,
+  CheckLine,
+  DangerButton,
+  Dialog,
+  GhostButton,
+  GoldButton,
+  LetterAvatar,
+  SurfaceCard,
 } from "../components/ui.jsx";
 
 const PLAY_URL = "https://play.google.com/store/apps/details?id=com.aghourservices";
@@ -44,8 +53,12 @@ function GuestProfile({ onAbout }) {
         <CheckLine>{S.benefitNotifications}</CheckLine>
         <CheckLine>{S.benefitFree}</CheckLine>
       </div>
-      <GoldButton className="w-full" onClick={() => nav("/login", { state: { from: "/account" } })}>{S.login}</GoldButton>
-      <GhostButton className="w-full" onClick={() => nav("/register", { state: { from: "/account" } })}>{S.register}</GhostButton>
+      <GoldButton className="w-full" onClick={() => nav("/login", { state: { from: "/account" } })}>
+        {S.login}
+      </GoldButton>
+      <GhostButton className="w-full" onClick={() => nav("/register", { state: { from: "/account" } })}>
+        {S.register}
+      </GhostButton>
       <InstallBanner />
       <SurfaceCard className="overflow-hidden divide-y divide-line">
         <Row icon="bell" label={S.notifications} onClick={() => nav("/notifications")} />
@@ -66,10 +79,18 @@ function Profile({ user, onAbout }) {
   // Each time the profile is shown: role / subscription / firms may have changed on the server.
   useEffect(() => {
     let alive = true;
-    Api.me().then((r) => alive && session.setUser(r.data)).catch(() => {});
+    Api.me()
+      .then((r) => alive && session.setUser(r.data))
+      .catch(() => {});
     Promise.all([
-      Api.myFirms({ perPage: 50 }).then((r) => r.data).catch(() => []),
-      plansOn ? Api.subscriptions({ perPage: 50 }).then((r) => r.data).catch(() => []) : Promise.resolve([]),
+      Api.myFirms({ perPage: 50 })
+        .then((r) => r.data)
+        .catch(() => []),
+      plansOn
+        ? Api.subscriptions({ perPage: 50 })
+            .then((r) => r.data)
+            .catch(() => [])
+        : Promise.resolve([]),
     ]).then(([firms, subs]) => {
       if (!alive) return;
       setData({
@@ -89,7 +110,9 @@ function Profile({ user, onAbout }) {
         <LetterAvatar name={user.name} />
         <div className="min-w-0 space-y-0.5">
           <p className="font-bold text-lg truncate">{user.name}</p>
-          <p className="text-sm text-muted" dir="ltr" style={{ textAlign: "right" }}>{user.email || user.phone}</p>
+          <p className="text-sm text-muted" dir="ltr" style={{ textAlign: "right" }}>
+            {user.email || user.phone}
+          </p>
           {user.role === "super_admin" && <Badge tone="gold">{S.roleSuperAdmin}</Badge>}
         </div>
       </div>
@@ -98,7 +121,12 @@ function Profile({ user, onAbout }) {
         {plansOn && <SubscriptionCard data={data} onPlans={() => nav("/plans")} />}
         <InstallBanner />
         <SurfaceCard className="overflow-hidden divide-y divide-line">
-          <Row icon="storefront" label={S.myFirms} trailing={String(data.firms.length)} onClick={() => nav("/my-firms")} />
+          <Row
+            icon="storefront"
+            label={S.myFirms}
+            trailing={String(data.firms.length)}
+            onClick={() => nav("/my-firms")}
+          />
           <Row icon="addBusiness" label={S.addFirm} onClick={() => nav("/firms/new")} />
           <Row icon="postAdd" label={S.addArticle} onClick={() => nav("/articles/new")} />
           {plansOn && <Row icon="card" label={S.subscriptionAndPlans} onClick={() => nav("/plans")} />}
@@ -110,7 +138,9 @@ function Profile({ user, onAbout }) {
           <Row icon="info" label={S.aboutApp} onClick={onAbout} />
           <Row icon="deleteForever" label={S.deleteAccount} onClick={() => nav("/delete-account")} />
         </SurfaceCard>
-        <DangerButton className="w-full" onClick={() => setConfirmLogout(true)}>{S.logout}</DangerButton>
+        <DangerButton className="w-full" onClick={() => setConfirmLogout(true)}>
+          {S.logout}
+        </DangerButton>
       </div>
 
       {confirmLogout && (
@@ -140,7 +170,11 @@ function SubscriptionCard({ data, onPlans }) {
     <SurfaceCard className="p-4">
       <div className="flex items-center gap-2">
         <p className="font-bold flex-1 truncate">{firms[0]?.name || S.subscriptionAndPlans}</p>
-        {current ? <Badge icon="verified">{S.verified}</Badge> : pending ? <Badge tone="gold">{S.underReview}</Badge> : null}
+        {current ? (
+          <Badge icon="verified">{S.verified}</Badge>
+        ) : pending ? (
+          <Badge tone="gold">{S.underReview}</Badge>
+        ) : null}
       </div>
       <div className="mt-2.5">
         {current ? (
@@ -158,7 +192,9 @@ function SubscriptionCard({ data, onPlans }) {
         ) : (
           <>
             <p className="text-muted text-sm">{S.noSubscription}</p>
-            <GoldButton className="w-full mt-2.5" onClick={onPlans}>{S.subscribeNow}</GoldButton>
+            <GoldButton className="w-full mt-2.5" onClick={onPlans}>
+              {S.subscribeNow}
+            </GoldButton>
           </>
         )}
       </div>
@@ -177,8 +213,12 @@ function Row({ icon, label, onClick, href, trailing }) {
   );
   const cls = "w-full flex items-center gap-3 px-3.5 py-3.5 text-start active:bg-surface2";
   return href ? (
-    <a href={href} target="_blank" rel="noreferrer" className={cls}>{inner}</a>
+    <a href={href} target="_blank" rel="noreferrer" className={cls}>
+      {inner}
+    </a>
   ) : (
-    <button onClick={onClick} className={cls}>{inner}</button>
+    <button onClick={onClick} className={cls}>
+      {inner}
+    </button>
   );
 }

@@ -31,10 +31,22 @@ export function ChangePassword() {
 
   return (
     <FormPage title={S.changePassword} error={submit.error} submitting={submit.busy} onSave={save}>
-      <FormField label={S.newPassword} type="password" autoComplete="new-password" value={f.password}
-        onChange={(e) => setF({ ...f, password: e.target.value })} error={errors.password} />
-      <FormField label={S.passwordConfirmation} type="password" autoComplete="new-password" value={f.confirmation}
-        onChange={(e) => setF({ ...f, confirmation: e.target.value })} error={errors.confirmation} />
+      <FormField
+        label={S.newPassword}
+        type="password"
+        autoComplete="new-password"
+        value={f.password}
+        onChange={(e) => setF({ ...f, password: e.target.value })}
+        error={errors.password}
+      />
+      <FormField
+        label={S.passwordConfirmation}
+        type="password"
+        autoComplete="new-password"
+        value={f.confirmation}
+        onChange={(e) => setF({ ...f, confirmation: e.target.value })}
+        error={errors.confirmation}
+      />
     </FormPage>
   );
 }

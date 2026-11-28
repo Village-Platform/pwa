@@ -141,7 +141,9 @@ export function IconTile({ url, size = 48 }) {
         className={src ? "w-full h-full object-cover" : "w-2/3 h-2/3 object-contain dark:hidden"}
         onError={(e) => (e.currentTarget.src = asset("brand/mark_green.png"))}
       />
-      {!src && <img src={asset("brand/mark_cream.png")} alt="" className="w-2/3 h-2/3 object-contain hidden dark:block" />}
+      {!src && (
+        <img src={asset("brand/mark_cream.png")} alt="" className="w-2/3 h-2/3 object-contain hidden dark:block" />
+      )}
     </div>
   );
 }
@@ -323,9 +325,13 @@ export function Dialog({ title, body, confirm, onConfirm, onCancel, danger, busy
         {body && <p className="text-muted mt-2 leading-relaxed">{body}</p>}
         <div className="flex gap-2 mt-5">
           {danger ? (
-            <DangerButton className="flex-1" onClick={onConfirm} disabled={busy}>{confirm}</DangerButton>
+            <DangerButton className="flex-1" onClick={onConfirm} disabled={busy}>
+              {confirm}
+            </DangerButton>
           ) : (
-            <GoldButton className="flex-1" onClick={onConfirm} disabled={busy}>{confirm}</GoldButton>
+            <GoldButton className="flex-1" onClick={onConfirm} disabled={busy}>
+              {confirm}
+            </GoldButton>
           )}
           {onCancel && (
             <GhostButton className="flex-1" onClick={onCancel}>
@@ -346,14 +352,27 @@ export function AlertBox({ title, body, onClose, children }) {
         {children}
         {title && <h3 className="text-lg font-bold">{title}</h3>}
         {body && <p className="text-muted mt-2 leading-relaxed whitespace-pre-line">{body}</p>}
-        <GoldButton className="w-full mt-5" onClick={onClose}>{S.ok}</GoldButton>
+        <GoldButton className="w-full mt-5" onClick={onClose}>
+          {S.ok}
+        </GoldButton>
       </div>
     </div>
   );
 }
 
 /** Form page shell: title bar, fields, save button (Android AdminFormScaffold). */
-export function FormPage({ title, loading, loadError, onRetry, error, submitting, onSave, saveLabel = S.save, children, extra }) {
+export function FormPage({
+  title,
+  loading,
+  loadError,
+  onRetry,
+  error,
+  submitting,
+  onSave,
+  saveLabel = S.save,
+  children,
+  extra,
+}) {
   return (
     <div className="pb-28">
       <ScreenTitle title={title} />

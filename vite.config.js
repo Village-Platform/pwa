@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { fileURLToPath } from "node:url";
 
 // "/" by default. The GitHub Pages workflow builds with BASE_PATH=/pwa/ (project site); a custom
 // domain would set it back to "/".
@@ -8,6 +9,16 @@ const base = process.env.BASE_PATH || "/";
 
 export default defineConfig({
   base,
+  resolve: {
+    // "@/lib/strings" = src/lib/strings. Used by the tests (tests/ mirrors src/); keep in sync with tsconfig paths.
+    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
+  },
+  test: {
+    environment: "jsdom",
+    include: ["tests/**/*.test.{ts,tsx,js,jsx}"],
+    setupFiles: ["./tests/setup.ts"],
+    css: false,
+  },
   plugins: [
     react(),
     VitePWA({

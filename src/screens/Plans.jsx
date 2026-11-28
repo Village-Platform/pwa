@@ -4,7 +4,16 @@ import { useLoad } from "../lib/hooks.js";
 import { useSession } from "../lib/session.js";
 import { egp } from "../lib/format.js";
 import { S } from "../lib/strings.js";
-import { Badge, CheckLine, ErrorBanner, GhostButton, GoldButton, MessageBox, ScreenTitle, SkeletonRows } from "../components/ui.jsx";
+import {
+  Badge,
+  CheckLine,
+  ErrorBanner,
+  GhostButton,
+  GoldButton,
+  MessageBox,
+  ScreenTitle,
+  SkeletonRows,
+} from "../components/ui.jsx";
 
 /** "اختر باقتك": the middle plan is highlighted as the most popular. Guests sign in first. */
 export default function Plans() {
@@ -26,7 +35,10 @@ export default function Plans() {
         {(plans || []).map((p, i) => {
           const hi = i === highlighted;
           return (
-            <div key={p.id} className={`rounded-2xl border-2 p-4 space-y-3 ${hi ? "border-gold bg-gold/10" : "border-line bg-surface"}`}>
+            <div
+              key={p.id}
+              className={`rounded-2xl border-2 p-4 space-y-3 ${hi ? "border-gold bg-gold/10" : "border-line bg-surface"}`}
+            >
               <div className="flex items-center gap-2">
                 <h2 className={`text-lg font-bold flex-1 ${hi ? "text-goldInk" : ""}`}>{p.name}</h2>
                 {hi && <Badge tone="gold">{S.mostPopular}</Badge>}
@@ -42,9 +54,13 @@ export default function Plans() {
                 <CheckLine>{S.planMaxFirms(p.max_firms)}</CheckLine>
               </div>
               {hi ? (
-                <GoldButton className="w-full" onClick={() => subscribe(p)}>{S.subscribe}</GoldButton>
+                <GoldButton className="w-full" onClick={() => subscribe(p)}>
+                  {S.subscribe}
+                </GoldButton>
               ) : (
-                <GhostButton className="w-full" onClick={() => subscribe(p)}>{S.subscribe}</GhostButton>
+                <GhostButton className="w-full" onClick={() => subscribe(p)}>
+                  {S.subscribe}
+                </GhostButton>
               )}
             </div>
           );

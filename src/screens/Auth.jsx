@@ -52,15 +52,33 @@ export function Login() {
           <h2 className="text-2xl font-extrabold">{S.loginTitle}</h2>
           <p className="text-muted">{S.loginHint}</p>
         </div>
-        <FormField label={S.phoneNumber} type="tel" inputMode="numeric" autoComplete="tel" dir="ltr"
-          value={phone} onChange={(e) => setPhone(e.target.value)} error={errors.phone} />
-        <FormField label={S.password} type="password" autoComplete="current-password"
-          value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} />
+        <FormField
+          label={S.phoneNumber}
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel"
+          dir="ltr"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          error={errors.phone}
+        />
+        <FormField
+          label={S.password}
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password}
+        />
         <ErrorBanner error={apiError} />
-        <GoldButton type="submit" disabled={busy} className="w-full">{busy ? S.loading : S.login}</GoldButton>
+        <GoldButton type="submit" disabled={busy} className="w-full">
+          {busy ? S.loading : S.login}
+        </GoldButton>
         <p className="text-center text-sm">
           {S.noAccountQ}{" "}
-          <Link to="/register" replace state={location.state} className="font-bold text-goldInk">{S.createAccountLink}</Link>
+          <Link to="/register" replace state={location.state} className="font-bold text-goldInk">
+            {S.createAccountLink}
+          </Link>
         </p>
       </form>
     </div>
@@ -88,7 +106,9 @@ export function Register() {
     setBusy(true);
     setApiError(null);
     try {
-      finish(await Api.register({ ...f, name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() || undefined }));
+      finish(
+        await Api.register({ ...f, name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() || undefined }),
+      );
     } catch (err) {
       setApiError(err);
     } finally {
@@ -105,15 +125,31 @@ export function Register() {
           <p className="text-muted">{S.registerHint}</p>
         </div>
         <FormField label={S.name} autoComplete="name" {...bind("name")} />
-        <FormField label={S.phoneNumber} type="tel" inputMode="numeric" autoComplete="tel" dir="ltr" {...bind("phone")} />
+        <FormField
+          label={S.phoneNumber}
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel"
+          dir="ltr"
+          {...bind("phone")}
+        />
         <FormField label={S.emailOptional} type="email" autoComplete="email" dir="ltr" {...bind("email")} />
         <FormField label={S.password} type="password" autoComplete="new-password" {...bind("password")} />
-        <FormField label={S.passwordConfirmation} type="password" autoComplete="new-password" {...bind("password_confirmation")} />
+        <FormField
+          label={S.passwordConfirmation}
+          type="password"
+          autoComplete="new-password"
+          {...bind("password_confirmation")}
+        />
         <ErrorBanner error={apiError} />
-        <GoldButton type="submit" disabled={busy} className="w-full">{busy ? S.loading : S.createAccount}</GoldButton>
+        <GoldButton type="submit" disabled={busy} className="w-full">
+          {busy ? S.loading : S.createAccount}
+        </GoldButton>
         <p className="text-center text-sm">
           {S.haveAccountQ}{" "}
-          <Link to="/login" replace state={location.state} className="font-bold text-goldInk">{S.login}</Link>
+          <Link to="/login" replace state={location.state} className="font-bold text-goldInk">
+            {S.login}
+          </Link>
         </p>
       </form>
     </div>

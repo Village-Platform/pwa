@@ -9,7 +9,16 @@ import { S } from "../lib/strings.js";
 import Icon from "../components/Icon.jsx";
 import InstallBanner from "../components/InstallBanner.jsx";
 import PullToRefresh from "../components/PullToRefresh.jsx";
-import { BrandMark, ErrorBanner, FirmRow, IconTile, NewsRow, SearchPill, SectionHeader, SkeletonRows } from "../components/ui.jsx";
+import {
+  BrandMark,
+  ErrorBanner,
+  FirmRow,
+  IconTile,
+  NewsRow,
+  SearchPill,
+  SectionHeader,
+  SkeletonRows,
+} from "../components/ui.jsx";
 import { asset } from "../lib/asset.js";
 
 export default function Home() {
@@ -23,7 +32,10 @@ export default function Home() {
   const firms = useLoad(() => Api.firms({ perPage: 4 }).then((r) => r.data), [tick]);
   const news = useLoad(() => Api.articles({ perPage: 3 }).then((r) => r.data), [tick]);
   // The bell is shown to guests too: their install has its own broadcast inbox.
-  const unread = useLoad(() => Api.notifications({ perPage: 1 }).then((r) => r.meta?.unread_count ?? 0), [tick, user?.id]);
+  const unread = useLoad(
+    () => Api.notifications({ perPage: 1 }).then((r) => r.meta?.unread_count ?? 0),
+    [tick, user?.id],
+  );
 
   // Signed in → add a firm directly (the server answers if the plan does not allow it);
   // guests → the plans when they are on; otherwise the banner is only artwork.
@@ -75,7 +87,11 @@ export default function Home() {
           ) : (
             <div className="flex gap-3 overflow-x-auto no-scrollbar px-4">
               {(cats.data || []).map((c) => (
-                <button key={c.id} onClick={() => nav(`/explore?category=${c.id}`)} className="w-[62px] shrink-0 flex flex-col items-center">
+                <button
+                  key={c.id}
+                  onClick={() => nav(`/explore?category=${c.id}`)}
+                  className="w-[62px] shrink-0 flex flex-col items-center"
+                >
                   <IconTile url={c.icon_url} size={50} />
                   <span className="mt-1 text-[11px] font-bold text-center w-full truncate">{c.name}</span>
                 </button>
@@ -87,10 +103,18 @@ export default function Home() {
         <div className="px-4 mt-4">
           {onAddFirm ? (
             <button onClick={onAddFirm} className="block w-full" aria-label={S.addYourFirm}>
-              <img src={asset("brand/cover_banner.jpg")} alt="" className="w-full aspect-[2/1] object-cover rounded-2xl" />
+              <img
+                src={asset("brand/cover_banner.jpg")}
+                alt=""
+                className="w-full aspect-[2/1] object-cover rounded-2xl"
+              />
             </button>
           ) : (
-            <img src={asset("brand/cover_banner.jpg")} alt="" className="w-full aspect-[2/1] object-cover rounded-2xl" />
+            <img
+              src={asset("brand/cover_banner.jpg")}
+              alt=""
+              className="w-full aspect-[2/1] object-cover rounded-2xl"
+            />
           )}
         </div>
 
@@ -110,7 +134,12 @@ export default function Home() {
             <SectionHeader title={S.sectionLatestNews} onSeeAll={() => nav("/news")} />
             <div className="px-4 space-y-2">
               {news.data.map((a) => (
-                <NewsRow key={a.id} article={a} relative={relativeTime(a.published_at)} onClick={() => nav(`/news/${a.id}`)} />
+                <NewsRow
+                  key={a.id}
+                  article={a}
+                  relative={relativeTime(a.published_at)}
+                  onClick={() => nav(`/news/${a.id}`)}
+                />
               ))}
             </div>
           </>
