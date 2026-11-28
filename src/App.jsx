@@ -3,33 +3,11 @@ import { useEffect, useState } from "react";
 import TabBar from "./components/TabBar.jsx";
 import ToastHost from "./components/Toast.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
-import RequireUser from "./components/RequireUser.jsx";
-import PlansGate from "./components/PlansGate.jsx";
-import { useOnline } from "./lib/hooks.js";
-import { S } from "./lib/strings.js";
-import Welcome, { welcomeDone } from "./screens/Welcome.jsx";
-import Home from "./screens/Home.jsx";
-import Explore from "./screens/Explore.jsx";
-import Firm from "./screens/Firm.jsx";
-import News from "./screens/News.jsx";
-import Article from "./screens/Article.jsx";
-import { Login, Register } from "./screens/Auth.jsx";
-import Account from "./screens/Account.jsx";
-import Notifications from "./screens/Notifications.jsx";
-import Settings from "./screens/Settings.jsx";
-import MyFirms from "./screens/MyFirms.jsx";
-import FirmForm from "./screens/FirmForm.jsx";
-import ArticleForm from "./screens/ArticleForm.jsx";
-import Plans from "./screens/Plans.jsx";
-import Pay from "./screens/Pay.jsx";
-import Payments from "./screens/Payments.jsx";
-import { ChangePassword, DeleteAccount } from "./screens/AccountSecurity.jsx";
+import { useOnline } from "./lib/hooks";
+import { S } from "./lib/strings";
 import { MessageBox, ScreenTitle } from "./components/ui.jsx";
-
-// URL paths double as deep links: a shared /firms/12 opens the firm, like Android's FirmRoute(12).
-const TAB_PATHS = ["/", "/explore", "/news", "/account"];
-const user = (el) => <RequireUser>{el}</RequireUser>;
-const plans = (el) => <PlansGate>{el}</PlansGate>;
+import { routes, guarded, TAB_PATHS } from "./routes.jsx";
+import Welcome, { welcomeDone } from "./features/welcome/Welcome.jsx";
 
 function Shell() {
   const { pathname } = useLocation();
@@ -62,32 +40,9 @@ function Shell() {
       {/* key: navigating to another screen clears a previous crash */}
       <ErrorBoundary key={pathname}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/account" element={<Account />} />
-
-          <Route path="/firms/:id" element={<Firm />} />
-          <Route path="/news/:id" element={<Article />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/settings" element={<Settings />} />
-
-          {/* Signed-in users: owners manage their firms and submit news (the server reviews both). */}
-          <Route path="/my-firms" element={user(<MyFirms />)} />
-          <Route path="/firms/new" element={user(<FirmForm />)} />
-          <Route path="/firms/:id/edit" element={user(<FirmForm />)} />
-          <Route path="/articles/new" element={user(<ArticleForm />)} />
-          <Route path="/articles/:id/edit" element={user(<ArticleForm />)} />
-          <Route path="/change-password" element={user(<ChangePassword />)} />
-          <Route path="/delete-account" element={user(<DeleteAccount />)} />
-
-          {/* Behind the server's `plans` flag. Plans is open to guests; paying needs an account. */}
-          <Route path="/plans" element={plans(<Plans />)} />
-          <Route path="/pay/:planId" element={plans(user(<Pay />))} />
-          <Route path="/payments" element={plans(user(<Payments />))} />
-
+          {routes.map((r) => (
+            <Route key={r.path} path={r.path} element={guarded(r)} />
+          ))}
           <Route
             path="*"
             element={
