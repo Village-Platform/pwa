@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 import { fileURLToPath } from "node:url";
 
@@ -21,6 +22,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["fonts/*.ttf", "brand/*", "icons/apple-touch-icon.png", "icons/favicon-32.png"],
@@ -44,6 +46,8 @@ export default defineConfig({
         ],
       },
       workbox: {
+        // Shows Firebase Cloud Messaging pushes and routes their taps (src/lib/push.ts).
+        importScripts: ["push-sw.js"],
         // App shell: every navigation gets index.html from the cache, so the app opens offline.
         navigateFallback: `${base}index.html`,
         globPatterns: ["**/*.{js,css,html,png,jpg,svg,ttf}"],

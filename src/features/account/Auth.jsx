@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { useForm } from "../../lib/useForm";
+import { track } from "../../lib/analytics";
 import { session } from "../../lib/session";
 import { normalizeDigits, validPhone } from "../../lib/format";
 import { S } from "../../lib/strings";
@@ -13,17 +14,18 @@ const onSubmit = (form) => (e) => {
 };
 
 // Login and Register return to the screen that asked for them (location.state.from), like Android.
-function useFinish() {
+function useFinish(event) {
   const nav = useNavigate();
   const from = useLocation().state?.from || "/account";
   return (payload) => {
+    track(event, { method: "phone" });
     session.signIn(payload.data);
     nav(from, { replace: true });
   };
 }
 
 export function Login() {
-  const finish = useFinish();
+  const finish = useFinish("login");
   const location = useLocation();
   const form = useForm({
     initial: { phone: "", password: "" },
@@ -81,7 +83,7 @@ export function Login() {
 }
 
 export function Register() {
-  const finish = useFinish();
+  const finish = useFinish("sign_up");
   const location = useLocation();
   const form = useForm({
     initial: { name: "", phone: "", email: "", password: "", password_confirmation: "" },

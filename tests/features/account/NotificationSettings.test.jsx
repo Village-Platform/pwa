@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ToastHost from "@/components/Toast.jsx";
+import { S } from "@/lib/strings";
 import NotificationSettings from "@/features/account/NotificationSettings.jsx";
 import { session } from "@/lib/session";
 
@@ -58,5 +59,12 @@ describe("NotificationSettings", () => {
     await waitFor(() =>
       expect(screen.getByRole("switch", { name: "الأخبار" })).toHaveAttribute("aria-checked", "false"),
     );
+  });
+
+  it("hides the push section until the server turns web push on", async () => {
+    mockServer();
+    open();
+    await screen.findByRole("switch", { name: "الأخبار" });
+    expect(screen.queryByText(S.pushTitle)).not.toBeInTheDocument();
   });
 });

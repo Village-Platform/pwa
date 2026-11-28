@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { useLoad } from "../../lib/hooks";
+import { track } from "../../lib/analytics";
 import { useForm } from "../../lib/useForm";
 import { S } from "../../lib/strings";
 import { toast } from "../../components/Toast.jsx";
@@ -50,6 +51,7 @@ export default function ArticleForm() {
       return articleId ? Api.updateArticle(articleId, body) : Api.createArticle(body);
     },
     onSuccess: (res) => {
+      track("article_submit", { mode: articleId ? "edit" : "create", kind: res.data.kind });
       if (res.data.review_status === "pending" || !res.data.published_at) setReviewDialog(res.data.id);
       else {
         toast(S.saved);

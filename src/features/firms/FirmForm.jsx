@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Api } from "../../api/endpoints";
 import { normalizeDigits, validCoordinates } from "../../lib/format";
 import { useLoad } from "../../lib/hooks";
+import { track } from "../../lib/analytics";
 import { useForm } from "../../lib/useForm";
 import { useSession } from "../../lib/session";
 import { S } from "../../lib/strings";
@@ -82,6 +83,7 @@ export default function FirmForm() {
       return firmId ? Api.updateFirm(firmId, body) : Api.createFirm(body);
     },
     onSuccess: (res) => {
+      track("firm_submit", { mode: firmId ? "edit" : "create", status: res.data.status });
       if (res.data.status === "pending") setReviewDialog(res.data.id);
       else {
         toast(S.firmSaved);

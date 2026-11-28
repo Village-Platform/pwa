@@ -4,6 +4,7 @@ import TabBar from "./components/TabBar.jsx";
 import ToastHost from "./components/Toast.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import { useOnline } from "./lib/hooks";
+import { trackScreen } from "./lib/analytics";
 import { S } from "./lib/strings";
 import { MessageBox, ScreenTitle } from "./components/ui.jsx";
 import { routes, guarded, TAB_PATHS } from "./routes.jsx";
@@ -22,6 +23,7 @@ function Shell() {
   useEffect(() => {
     if (navType !== "POP") window.scrollTo(0, 0);
   }, [pathname, navType]);
+  useEffect(() => trackScreen(pathname), [pathname]);
 
   if (showWelcome) {
     return (
