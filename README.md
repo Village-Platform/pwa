@@ -4,8 +4,8 @@ The iPhone (and any browser) version of the Aghour village app: a Progressive We
 Rails API as the Android app (`/api/v1/`). iPhone users install it from Safari with
 Share → "Add to Home Screen" (the app shows a guide).
 
-Stack: React 18, Vite 5, Tailwind 3, `vite-plugin-pwa` (Workbox). Works on Node 18
-(`serialize-javascript` is pinned in `overrides` because v7 needs Node 20).
+Stack: React 18, Vite 5, Tailwind 3, `vite-plugin-pwa` (Workbox). Needs Node 22.22+, 24.15+ or 26+
+(the test environment, jsdom 31, requires it); `.nvmrc` pins 24, which CI and deploys use.
 
 ## Run
 
@@ -63,9 +63,64 @@ https://village-platform.github.io/pwa/
   (empty until web push registers the device), Plans when the `plans` flag is on.
 - **Signed in:** profile with subscription card, My firms, add / edit / delete a firm (location by GPS,
   Google Maps link or numbers), owner controls on the firm page, add / edit / delete an article,
-  Plans → Pay → Payments (behind the `plans` flag), change password, delete account, logout.
+  Plans → Pay → Payments (behind the `plans` flag), edit profile, change password, delete account,
+  logout.
+- **Also signed in:** My articles with review status, notification topics (Settings), unread filter.
+- **Reviewers (`admin`, `super_admin`):** the review queue (`/review`), and approve / reject with a
+  reason on a firm or article page. The buttons show only when the server's `can.review` says so.
 
-Not in v1: super-admin category and plan editors (use the server's `/admin` dashboard), web push.
+Not yet: super-admin category and plan editors (use the server's `/admin` dashboard), device
+registration and web push (the server accepts only `platform: android` for now).
+
+## Development
+
+```bash
+npm run check          # lint + format check + typecheck + tests + build: run before every commit
+npm run typecheck      # tsc --noEmit
+npm test               # Vitest + Testing Library (jsdom); `npm run test:watch` while working
+npx vitest run tests/lib   # one folder or file
+npm run lint           # ESLint; `npm run format` writes Prettier formatting
+```
+
+CI runs lint, the format check, the type check and the tests before building.
+
+### Layout
+
+```
+src/
+  features/<name>/   one folder per feature: its screens, its components, and routes.jsx
+  routes.jsx         composes every feature's routes, defines the route guards
+  api/               client.js (auth, guest token, errors, uploads) + one module per domain;
+                     endpoints.js combines them as `Api`
+  components/        shared UI (ui.jsx kit, PagedList, ReviewControls, FeatureGate, ...)
+  lib/               hooks (useLoad, usePaged, useShare), useForm, errors, features (flags), session,
+                     strings (all Arabic copy), format
+tests/               all tests, mirroring src/ (tests/lib/hooks.test.tsx tests src/lib/hooks.ts)
+  setup.ts           test environment (in-memory storage, matchMedia)
+  helpers.ts         json() fake responses, testUser(), sent() to read a recorded fetch call
+```
+
+### TypeScript
+
+TypeScript is on in strict mode, and `.js`/`.jsx` files still work next to `.ts`/`.tsx` (`allowJs`).
+`src/api` and `src/lib` are TypeScript: the API's data shapes are in `src/api/types.ts`, and `api<T>()`,
+`useLoad<T>()`, `usePaged<T>()` and `useForm<V>()` are generic, so a screen gets typed data.
+Screens and components are still JSX and are not type-checked yet (`checkJs` is off). Write **new** files
+in TypeScript, and convert a JSX file when you touch it: rename it to `.tsx`, fix what `npm run typecheck`
+reports, and import converted modules without an extension.
+
+### Adding a feature
+
+1. Create `src/features/<name>/` with the screens, and a `routes.tsx` (or `.jsx`) exporting
+   `routes = [{ path, element, guards?, tab? }]`. Guards: `"user"`, `"reviewer"`, `"plans"`.
+2. Add one import and one spread in `src/routes.jsx`.
+3. New endpoints go in `src/api/<domain>.ts` (add the response types to `src/api/types.ts`) and are
+   spread into `Api` in `src/api/endpoints.ts`.
+4. Reuse: `useLoad` (one thing), `usePaged` + `PagedList` (infinite list), `useForm` (validation,
+   submit, server field errors), `ErrorBanner` (shows a link for known error codes, see
+   `lib/errors.js`), `useFlag("name")` / `<FeatureGate flag>` for server flags.
+5. Put every Arabic string in `src/lib/strings.ts`. Write tests in `tests/`, in the same path as the
+   file they cover. Import app code with the `@` alias (`@/lib/strings` is `src/lib/strings`).
 
 ## Design notes
 

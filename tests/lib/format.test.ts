@@ -1,5 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { egp, formatDate, relativeTime, validPhone, whatsappUrl } from "@/lib/format";
+import {
+  egp,
+  formatDate,
+  notificationAction,
+  normalizeDigits,
+  parseCoordinates,
+  relativeTime,
+  validCoordinates,
+  validPhone,
+  whatsappUrl,
+} from "@/lib/format";
+import type { AppNotification } from "@/api/types";
 
 describe("relativeTime", () => {
   const NOW = new Date("2026-11-27T12:00:00Z");
@@ -44,5 +55,63 @@ describe("format helpers", () => {
   it("validates Egyptian mobile numbers", () => {
     expect(validPhone("01012345678")).toBe(true);
     expect(validPhone("1012345678")).toBe(false);
+  });
+});
+
+describe("Arabic digits and coordinates", () => {
+  it("turns Arabic-Indic and Eastern Arabic-Indic digits into 0-9", () => {
+    expect(normalizeDigits("٠١٠١٢٣٤٥٦٧٨")).toBe("01012345678");
+    expect(normalizeDigits("۰۱۲۳۴۵۶۷۸۹")).toBe("0123456789");
+    expect(normalizeDigits("٣٠٫٥")).toBe("30.5");
+    expect(normalizeDigits("abc 12")).toBe("abc 12");
+  });
+
+  it("accepts a phone typed with Arabic digits", () => {
+    expect(validPhone("٠١٠١٢٣٤٥٦٧٨")).toBe(true);
+  });
+
+  it("checks coordinate ranges like the server", () => {
+    expect(validCoordinates("", "")).toBe(true);
+    expect(validCoordinates("30.28", "31.33")).toBe(true);
+    expect(validCoordinates("٣٠٫٢٨", "٣١٫٣٣")).toBe(true);
+    expect(validCoordinates("200", "31")).toBe(false);
+    expect(validCoordinates("30", "181")).toBe(false);
+    expect(validCoordinates("30", "")).toBe(false);
+    expect(validCoordinates("abc", "31")).toBe(false);
+  });
+
+  it("parses pasted coordinates, even with Arabic digits or a stray %", () => {
+    expect(parseCoordinates("https://maps.google.com/?q=30.36,31.21")).toEqual({ lat: 30.36, lng: 31.21 });
+    expect(parseCoordinates("٣٠٫٣٦, ٣١٫٢١")).toEqual({ lat: 30.36, lng: 31.21 });
+    expect(() => parseCoordinates("100% 30.36,31.21")).not.toThrow();
+    expect(parseCoordinates("100% 30.36,31.21")).toEqual({ lat: 30.36, lng: 31.21 });
+  });
+});
+
+describe("notificationAction", () => {
+  const n = (data: AppNotification["data"], kind = ""): AppNotification => ({
+    id: 1,
+    kind,
+    title: "",
+    body: "",
+    read: false,
+    read_at: null,
+    created_at: "",
+    data,
+  });
+
+  it("routes known screens", () => {
+    expect(notificationAction(n({ screen: "firm", id: "12" }), { plansOn: true })).toBe("/firms/12");
+    expect(notificationAction(n({ screen: "article", id: "5" }), { plansOn: true })).toBe("/news/5");
+    expect(notificationAction(n({ screen: "category", id: "3" }), { plansOn: true })).toBe("/explore?category=3");
+  });
+
+  it("opens the inbox for a screen it does not know", () => {
+    expect(notificationAction(n({ screen: "something_new", id: "1" }), { plansOn: true })).toBe("/notifications");
+    expect(notificationAction(n({ screen: "toString" }), { plansOn: true })).toBe("/notifications");
+  });
+
+  it("drops plan targets while the plans feature is off", () => {
+    expect(notificationAction(n({ screen: "subscription" }), { plansOn: false })).toBeNull();
   });
 });

@@ -1,9 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { useId } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Icon from "./Icon.jsx";
-import { S } from "../lib/strings.js";
-import { assetUrl } from "../api/client.js";
-import { kindTone } from "../lib/format.js";
-import { asset } from "../lib/asset.js";
+import { S } from "../lib/strings";
+import { ApiError, assetUrl } from "../api/client";
+import { kindTone } from "../lib/format";
+import { asset } from "../lib/asset";
+import { errorAction } from "../lib/errors";
+import { useFlag } from "../lib/features";
+import { useModal } from "../lib/useModal";
 
 // Web counterparts of the Android ui/components widgets (same names where they exist there).
 
@@ -99,10 +103,20 @@ export function Badge({ children, tone = "green", icon }) {
 }
 
 export function ErrorBanner({ error, onRetry }) {
+  const action = errorAction(error);
+  // Hide an action whose screen is behind a flag that is known to be off.
+  const flagOn = useFlag(action?.needs ?? "");
+  const actionAllowed = !action?.needs || flagOn !== false;
   if (!error) return null;
   return (
-    <div className="mx-4 my-3 rounded-xl border border-bad/40 bg-bad/10 p-3 text-sm">
-      <p className="text-bad">{error.message || S.genericError}</p>
+    <div className="mx-4 my-3 rounded-xl border border-bad/40 bg-bad/10 p-3 text-sm" role="alert">
+      {/* The server's Arabic message, or a generic one: never a technical (English) error text. */}
+      <p className="text-bad">{error instanceof ApiError ? error.message || S.genericError : S.genericError}</p>
+      {action && actionAllowed && (
+        <Link to={action.to} className="mt-2 inline-block font-bold text-ink underline">
+          {action.label}
+        </Link>
+      )}
       {onRetry && (
         <button onClick={onRetry} className="mt-2 font-bold text-ink underline">
           {S.retry}
@@ -190,6 +204,7 @@ export function FilterChipsRow({ items, selected, onSelect }) {
           <button
             type="button"
             key={String(it.value)}
+            aria-pressed={on}
             onClick={() => onSelect(it.value)}
             className={`shrink-0 h-9 px-4 rounded-full text-sm font-semibold border ${
               on ? "bg-ink text-page border-ink" : "bg-surface text-ink border-line"
@@ -226,32 +241,46 @@ export function FieldLabel({ children }) {
 }
 
 export function FormField({ label, error, ...props }) {
+  const errorId = useId();
   return (
     <label className="block">
       <FieldLabel>{label}</FieldLabel>
       <input
         {...props}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
         className={`w-full h-12 rounded-xl bg-surface2 px-4 text-base outline-none border ${
           error ? "border-bad" : "border-transparent focus:border-gold"
         }`}
       />
-      {error && <span className="block text-sm text-bad mt-1">{error}</span>}
+      {error && (
+        <span id={errorId} className="block text-sm text-bad mt-1">
+          {error}
+        </span>
+      )}
     </label>
   );
 }
 
 export function TextArea({ label, error, rows = 5, ...props }) {
+  const errorId = useId();
   return (
     <label className="block">
       <FieldLabel>{label}</FieldLabel>
       <textarea
         rows={rows}
         {...props}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
         className={`w-full rounded-xl bg-surface2 px-4 py-3 text-base outline-none border resize-y ${
           error ? "border-bad" : "border-transparent focus:border-gold"
         }`}
       />
-      {error && <span className="block text-sm text-bad mt-1">{error}</span>}
+      {error && (
+        <span id={errorId} className="block text-sm text-bad mt-1">
+          {error}
+        </span>
+      )}
     </label>
   );
 }
@@ -259,11 +288,12 @@ export function TextArea({ label, error, rows = 5, ...props }) {
 /** Segmented control (Android Segmented). */
 export function Segmented({ options, selected, onSelect }) {
   return (
-    <div className="inline-flex rounded-xl bg-surface2 p-1 gap-1">
+    <div role="group" className="inline-flex rounded-xl bg-surface2 p-1 gap-1">
       {options.map((o) => (
         <button
           type="button"
           key={o.value}
+          aria-pressed={selected === o.value}
           onClick={() => onSelect(o.value)}
           className={`h-9 px-4 rounded-lg text-sm font-semibold ${selected === o.value ? "bg-gold text-black" : "text-ink"}`}
         >
@@ -317,46 +347,66 @@ export function LetterAvatar({ name, size = 56 }) {
 }
 
 /** Confirm dialog. `danger` paints the confirm button red (delete, logout). */
-export function Dialog({ title, body, confirm, onConfirm, onCancel, danger, busy }) {
+/** The backdrop and panel shared by Dialog and AlertBox: role=dialog, focus kept inside, Escape closes. */
+function Modal({ title, lead, onClose, className = "", children }) {
+  const ref = useModal(onClose);
+  const titleId = useId();
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-6" onClick={onCancel}>
-      <div className="w-full max-w-sm rounded-2xl bg-surface p-5" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold">{title}</h3>
-        {body && <p className="text-muted mt-2 leading-relaxed">{body}</p>}
-        <div className="flex gap-2 mt-5">
-          {danger ? (
-            <DangerButton className="flex-1" onClick={onConfirm} disabled={busy}>
-              {confirm}
-            </DangerButton>
-          ) : (
-            <GoldButton className="flex-1" onClick={onConfirm} disabled={busy}>
-              {confirm}
-            </GoldButton>
-          )}
-          {onCancel && (
-            <GhostButton className="flex-1" onClick={onCancel}>
-              {S.cancel}
-            </GhostButton>
-          )}
-        </div>
+    <div className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-6" onClick={onClose}>
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        tabIndex={-1}
+        className={`w-full max-w-sm rounded-2xl bg-surface p-5 outline-none ${className}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {lead}
+        {title && (
+          <h3 id={titleId} className="text-lg font-bold">
+            {title}
+          </h3>
+        )}
+        {children}
       </div>
     </div>
   );
 }
 
-/** One-button message (Android AlertDialog with only "OK"). */
+export function Dialog({ title, body, confirm, onConfirm, onCancel, danger, busy, children }) {
+  return (
+    <Modal title={title} onClose={onCancel}>
+      {body && <p className="text-muted mt-2 leading-relaxed">{body}</p>}
+      {children}
+      <div className="flex gap-2 mt-5">
+        {danger ? (
+          <DangerButton className="flex-1" onClick={onConfirm} disabled={busy}>
+            {confirm}
+          </DangerButton>
+        ) : (
+          <GoldButton className="flex-1" onClick={onConfirm} disabled={busy}>
+            {confirm}
+          </GoldButton>
+        )}
+        {onCancel && (
+          <GhostButton className="flex-1" onClick={onCancel}>
+            {S.cancel}
+          </GhostButton>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
 export function AlertBox({ title, body, onClose, children }) {
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-6" onClick={onClose}>
-      <div className="w-full max-w-sm rounded-2xl bg-surface p-5 text-center" onClick={(e) => e.stopPropagation()}>
-        {children}
-        {title && <h3 className="text-lg font-bold">{title}</h3>}
-        {body && <p className="text-muted mt-2 leading-relaxed whitespace-pre-line">{body}</p>}
-        <GoldButton className="w-full mt-5" onClick={onClose}>
-          {S.ok}
-        </GoldButton>
-      </div>
-    </div>
+    <Modal title={title} lead={children} onClose={onClose} className="text-center">
+      {body && <p className="text-muted mt-2 leading-relaxed whitespace-pre-line">{body}</p>}
+      <GoldButton className="w-full mt-5" onClick={onClose}>
+        {S.ok}
+      </GoldButton>
+    </Modal>
   );
 }
 

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import Icon from "./Icon.jsx";
-import { S } from "../lib/strings.js";
+import { S } from "../lib/strings";
 
 const TABS = [
   { to: "/", icon: "home", label: S.tabHome, end: true },
